@@ -1,10 +1,19 @@
-from typing import Union
+from typing import Annotated, List, Union
 from fastapi.middleware.cors import CORSMiddleware
 from db_init import init_db
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 import os
+from sqlmodel import Session, select
+from models import User
+from db import (
+    get_session,
+    engine,
+    commit_and_handle_exception,
+    refresh_and_handle_exception,
+)
 
 app = FastAPI()
+
 
 ALLOWED_ORIGIN: list = (
     os.getenv("CORS_ALLOWED_ORIGIN", "http://localhost:8000")
@@ -30,5 +39,33 @@ app.add_middleware(
     allow_headers=ALLOWED_HEADERS,
     max_age=MAX_AGE,
 )
+
+db_dependency = Annotated[Session, Depends(get_session)]
+
+@app.post("/addUser", response_model=User)
+def create_user(session: db_dependency):
+
+    new_user = User(
+        username="user_create.name.strip(),",
+        email="asdasd",
+        password_hash="asdasd",
+        first_name="asdasd",
+        last_name="asdasd",
+        profile_picture_url="asdasd",
+    )
+
+    session.add(new_user)
+    commit_and_handle_exception(session)
+    refresh_and_handle_exception(session, new_user)
+    return new_user
+
+@app.get("/getUsers", response_model=List[User])
+def get_users(session: db_dependency):
+    users = session.exec(select(User)).all()
+    return users
+
+@app.get("/")
+def root():
+    return {"message": "Hello World"}
 
 init_db()
