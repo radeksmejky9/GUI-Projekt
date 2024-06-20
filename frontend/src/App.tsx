@@ -1,13 +1,12 @@
 import React from 'react';
+import UserList from './components/UserList';
 
-function App() {
+const App: React.FC = () => {
   return (
     <div className="App">
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
+      <UserList />
     </div>
   );
-}
+};
 
 export default App;
