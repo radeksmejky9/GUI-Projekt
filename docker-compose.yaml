@@ -50,7 +50,7 @@ services:
     build: ./frontend
     container_name: react-container
     ports:
-      - "5173:5173"
+      - "3000:3000"
     depends_on:
       - fastapi
     volumes:
