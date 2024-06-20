@@ -1,0 +1,15 @@
+{
+  "name": "npm-init",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "react-scripts": "^5.0.1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  }
+}
