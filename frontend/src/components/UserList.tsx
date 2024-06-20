@@ -4,31 +4,19 @@ import { getUsers } from '../services/userService';
 
 const UserList: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchData = async () => {
             try {
-                const users = await getUsers();
-                setUsers(users);
-            } catch (err: unknown) {
-                if (typeof err === 'string') {
-                    setError(err);
-                } else if (err instanceof Error) {
-                    setError(err.message);
-                } else {
-                    setError('An unexpected error occurred');
-                }
-            } finally {
-                setLoading(false);
+                const result = await getUsers();
+                setUsers(result);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
             }
         };
-        fetchUsers();
-    }, []);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+        fetchData();
+    }, []);
 
     return (
         <div>

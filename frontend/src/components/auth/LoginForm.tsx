@@ -1,5 +1,3 @@
-// src/components/auth/LoginForm.tsx
-
 import React, { useState } from 'react';
 
 const LoginForm: React.FC = () => {

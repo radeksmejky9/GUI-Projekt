@@ -1,5 +1,3 @@
-// src/components/auth/SignUpForm.tsx
-
 import React, { useState } from 'react';
 
 const SignUpForm: React.FC = () => {
@@ -13,7 +11,6 @@ const SignUpForm: React.FC = () => {
         console.log('Username:', username);
         console.log('Email:', email);
         console.log('Password:', password);
-        // Here you can implement logic to register the user with your backend
     };
 
     return (
