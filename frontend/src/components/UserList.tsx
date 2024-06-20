@@ -12,8 +12,14 @@ const UserList: React.FC = () => {
             try {
                 const users = await getUsers();
                 setUsers(users);
-            } catch (err) {
-                setError(err.message);
+            } catch (err: unknown) {
+                if (typeof err === 'string') {
+                    setError(err);
+                } else if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError('An unexpected error occurred');
+                }
             } finally {
                 setLoading(false);
             }

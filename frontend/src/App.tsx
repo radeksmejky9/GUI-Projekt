@@ -1,10 +1,12 @@
 import React from 'react';
-import UserList from './components/UserList';
+import LoginForm from './components/auth/LoginForm';
+import SignUpForm from './components/auth/SignUpForm';
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <UserList />
+      <LoginForm />
+      <SignUpForm />
     </div>
   );
 };
