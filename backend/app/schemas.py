@@ -64,4 +64,3 @@ class Task(SQLModel, table=True):
     card_id: int = Field(foreign_key="cards.id")
 
     card: "Card" = Relationship(back_populates="tasks")
-

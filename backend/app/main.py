@@ -25,8 +25,4 @@ app.add_middleware(
     max_age=CORS_MAX_AGE,
 )
 
-@app.get("/")
-def root():
-    return {"message": "Hello World"}
-
 init_db()

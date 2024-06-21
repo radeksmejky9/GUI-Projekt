@@ -10,6 +10,8 @@ from db import get_session
 from models.user_model import UserModel
 from jose import jwt
 
+from schemas import User
+
 JWT_SECRET_KEY = os.getenv(
     "JWT_SECRET_KEY", "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 )
@@ -35,7 +37,7 @@ db_dependency = Annotated[Session, Depends(get_session)]
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserModel, db: db_dependency):
-    new_user = UserModel(
+    new_user = User(
         username=user.username.strip(),
         email=user.email,
         password_hash=bcrypt_context.hash(user.password),

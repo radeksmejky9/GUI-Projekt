@@ -11,8 +11,6 @@ const Login: React.FC = () => {
     if (token) {
         // decode token, validate
         window.location.href = '/';
-    } else {
-        window.location.href = '/login';
     }
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUserCredentials(prevState => ({
