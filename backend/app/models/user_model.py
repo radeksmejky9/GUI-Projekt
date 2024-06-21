@@ -1,10 +1,5 @@
-import re
 from typing import Union
-from pydantic import BaseModel, ConfigDict, Field, field_validator, EmailStr
-from email_validator import validate_email, EmailNotValidError
-from pydantic_core.core_schema import FieldValidationInfo
-
-
+from pydantic import BaseModel
 class UserModel(BaseModel):
     username: str
     email: str

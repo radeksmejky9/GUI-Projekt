@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
-from schemas import User
+from db.schemas import User
 from typing import Annotated, List
-from db import commit_and_handle_exception, get_session, refresh_and_handle_exception
+from db.database import commit_and_handle_exception, get_session, refresh_and_handle_exception
 
-router = APIRouter()
+router = APIRouter(tags=["users"])
 db_dependency = Annotated[Session, Depends(get_session)]
 
 @router.post("/addUser", response_model=User)
