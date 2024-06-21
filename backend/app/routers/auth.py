@@ -7,10 +7,10 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlmodel import Session
 from db import commit_and_handle_exception, get_session, refresh_and_handle_exception
+from db.schemas import User
 from models.user_model import UserModel
 from jose import jwt
 
-from schemas import User
 
 JWT_SECRET_KEY = os.getenv(
     "JWT_SECRET_KEY", "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
@@ -31,9 +31,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-
 db_dependency = Annotated[Session, Depends(get_session)]
-
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserModel, session: db_dependency):
@@ -51,14 +49,13 @@ async def create_user(user: UserModel, session: db_dependency):
     refresh_and_handle_exception(session, new_user)
     return new_user
 
-    return new_user
 
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: db_dependency
 ):
-    user = authenticate_user(form_data.username, form_data.password, db)
+    user = authenticate_user(form_data.username, form_data.password, session)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token_expires = timedelta(minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -68,8 +65,8 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-def authenticate_user(username: str, password: str, db: db_dependency):
-    user = db.query(UserModel).filter(UserModel.username == username).first()
+def authenticate_user(username: str, password: str, session: db_dependency):
+    user = session.query(UserModel).filter(UserModel.username == username).first()
     if not user:
         return False
     if not bcrypt_context.verify(password, user.password_hash):

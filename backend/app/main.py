@@ -1,6 +1,6 @@
 import os
 from fastapi.middleware.cors import CORSMiddleware
-from db_init import init_db
+from db.db_init import init_db
 from fastapi import FastAPI
 from routers import users, auth
 
