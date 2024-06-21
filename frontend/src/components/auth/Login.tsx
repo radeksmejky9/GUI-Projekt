@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Login: React.FC = () => {
     const [userCredentials, setUserCredentials] = useState({
@@ -8,10 +8,22 @@ const Login: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     const token = localStorage.getItem('token');
-    if (token) {
-        // decode token, validate
-        window.location.href = '/';
-    }
+    useEffect(() => {
+        if (token) {
+            try {
+                const decodedToken: any = jwtDecode(token);
+                const currentTime = Date.now() / 1000;
+                if (decodedToken.exp < currentTime) {
+                    localStorage.removeItem('token');
+                    throw new Error('Token has expired');
+                }
+            } catch (err) {
+                console.error('Token validation failed:', err);
+                localStorage.removeItem('token');
+                setError('Session expired. Please log in again.');
+            }
+        }
+    }, [token]);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUserCredentials(prevState => ({
             ...prevState,
@@ -108,3 +120,7 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+function jwtDecode(token: string): any {
+    throw new Error('Function not implemented.');
+}
+
