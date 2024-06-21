@@ -47,9 +47,4 @@ async def get_users(session: db_dependency):
     return users
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
 init_db()
