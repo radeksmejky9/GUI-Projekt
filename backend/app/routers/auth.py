@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlmodel import Session
-from db import get_session
+from db import commit_and_handle_exception, get_session, refresh_and_handle_exception
 from models.user_model import UserModel
 from jose import jwt
 
@@ -36,7 +36,7 @@ db_dependency = Annotated[Session, Depends(get_session)]
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(user: UserModel, db: db_dependency):
+async def create_user(user: UserModel, session: db_dependency):
     new_user = User(
         username=user.username.strip(),
         email=user.email,
@@ -46,13 +46,10 @@ async def create_user(user: UserModel, db: db_dependency):
         profile_picture_url=user.profile_picture_url,
     )
 
-    db.add(new_user)
-    try:
-        db.commit()
-        db.refresh(new_user)
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=400, detail=str(e))
+    session.add(new_user)
+    commit_and_handle_exception(session)
+    refresh_and_handle_exception(session, new_user)
+    return new_user
 
     return new_user
 
