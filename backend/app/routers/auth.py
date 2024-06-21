@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
 import os
+from datetime import datetime, timedelta
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from passlib.context import CryptContext
@@ -7,8 +7,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlmodel import Session
 from db import get_session
-from models import User
-from schemas import CreateUserRequest
+from models.user_model import UserModel
 from jose import jwt
 
 JWT_SECRET_KEY = os.getenv(
@@ -35,8 +34,8 @@ db_dependency = Annotated[Session, Depends(get_session)]
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(user: CreateUserRequest, db: db_dependency):
-    new_user = User(
+async def create_user(user: UserModel, db: db_dependency):
+    new_user = UserModel(
         username=user.username.strip(),
         email=user.email,
         password_hash=bcrypt_context.hash(user.password),
@@ -71,7 +70,7 @@ async def login_for_access_token(
 
 
 def authenticate_user(username: str, password: str, db: db_dependency):
-    user = db.query(User).filter(User.username == username).first()
+    user = db.query(UserModel).filter(UserModel.username == username).first()
     if not user:
         return False
     if not bcrypt_context.verify(password, user.password_hash):

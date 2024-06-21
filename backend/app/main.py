@@ -1,25 +1,12 @@
-from typing import Annotated, List, Union
-from fastapi.middleware.cors import CORSMiddleware
-from schemas import CreateUserRequest
-from db_init import init_db
-from fastapi import FastAPI, Depends, HTTPException
 import os
-from sqlmodel import Session, select
-from models import User
-from passlib.context import CryptContext
-import auth
-
-from db import (
-    get_session,
-    engine,
-    commit_and_handle_exception,
-    refresh_and_handle_exception,
-)
+from fastapi.middleware.cors import CORSMiddleware
+from db_init import init_db
+from fastapi import FastAPI
+from routers import users, auth
 
 app = FastAPI()
 app.include_router(auth.router)
-
-bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+app.include_router(users.router)
 
 CORS_ALLOWED_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")
 CORS_ALLOWED_METHODS = os.getenv(
@@ -38,13 +25,8 @@ app.add_middleware(
     max_age=CORS_MAX_AGE,
 )
 
-db_dependency = Annotated[Session, Depends(get_session)]
-
-
-@app.get("/getUsers", response_model=List[User])
-async def get_users(session: db_dependency):
-    users = session.exec(select(User)).all()
-    return users
-
+@app.get("/")
+def root():
+    return {"message": "Hello World"}
 
 init_db()

@@ -1,7 +1,7 @@
 from db import engine
 from sqlmodel import SQLModel, Session
 from sqlalchemy.engine import reflection
-import models
+import schemas
 
 
 def init_db():
