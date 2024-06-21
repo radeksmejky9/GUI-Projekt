@@ -1,22 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { User } from '../types/models';
-import { getUsers } from '../services/userService';
 
 const UserList: React.FC = () => {
+    const [error, setError] = useState();
+    const [isLoading, setIsLoading] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchUsers = async () => {
+            setIsLoading(true);
             try {
-                const result = await getUsers();
-                setUsers(result);
-            } catch (error) {
-                console.error("Error fetching user data:", error);
+                const response = await fetch('http://localhost:8000/getUsers');
+                const users = (await response.json()) as User[];
+                setUsers(users);
+            } catch (e: any) {
+                setError(e);
+            } finally {
+                setIsLoading(false);
             }
         };
-
-        fetchData();
+        fetchUsers();
     }, []);
+
+    if (error) {
+        return <div>Something went wrong.</div>;
+    }
+    if (isLoading) {
+        return <div>Something went wrong.</div>;
+    }
 
     return (
         <div>
