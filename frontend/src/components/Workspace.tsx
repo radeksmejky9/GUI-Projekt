@@ -34,9 +34,8 @@ const Workspace = ({ title }: WorkspaceProps) => {
 
   return (
     <div>
-      <h1 className="text-2xl">{title}</h1>
-
-      <div className="gap-4 bg-green-100 m-4 text-center flex overflow-x-auto space-x-4 p-4">
+      <h1 className="text-2xl mx-4">{title}</h1>
+      <div className="gap-4 bg-green-100 text-center flex overflow-x-auto space-x-4 px-4">
         {cards.map((card) => (
           <Card title={card.title} tasks={card.tasks} />
         ))}
