@@ -7,8 +7,6 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <LoginForm />
-      <SignUpForm />
-      <UserList />
     </div>
   );
 };

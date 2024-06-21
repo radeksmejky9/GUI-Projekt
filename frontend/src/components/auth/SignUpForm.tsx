@@ -11,32 +11,15 @@ const SignUpForm: React.FC = () => {
         profile_picture_url: '',
     });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log(JSON.stringify(newUser))
-        try {
-            const response = await fetch('http://localhost:8000/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newUser),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to create user');
-            }
-
-        } catch (e: any) {
-            setError(e.message);
-        }
-    };
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewUser({
             ...newUser,
             [e.target.name]: e.target.value,
         });
+    };
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
     };
 
     return (
