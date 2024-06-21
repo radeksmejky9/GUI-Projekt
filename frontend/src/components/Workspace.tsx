@@ -1,43 +1,46 @@
-import React, { useEffect, useState } from "react";
-import { User } from "../types/models";
+import Card from "./Card";
 
-const Workspace: React.FC = () => {
-  const [error, setError] = useState();
-  const [isLoading, setIsLoading] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
-  const apiUrl = process.env.REACT_APP_CONNECTION_IP;
+type WorkspaceProps = {
+  title: string;
+};
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`http://${apiUrl}:8000/getUsers`);
-        const users = (await response.json()) as User[];
-        setUsers(users);
-      } catch (e: any) {
-        setError(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchUsers();
-  }, []);
-
-  if (error) {
-    return <div>Something went wrong.</div>;
-  }
-  if (isLoading) {
-    return <div>Something went wrong.</div>;
-  }
+const Workspace = ({ title }: WorkspaceProps) => {
+  const cards = [
+    {
+      title: "hi",
+      tasks: [
+        { title: "Task 1", desc: "Description of Task 1" },
+        { title: "Task 2", desc: "Description of Task 2" },
+        { title: "Task 3", desc: "Description of Task 3" },
+      ],
+    },
+    {
+      title: "hello",
+      tasks: [
+        { title: "Task 1", desc: "Description of Task 1" },
+        { title: "Task 2", desc: "Description of Task 2" },
+        { title: "Task 3", desc: "Description of Task 3" },
+      ],
+    },
+    {
+      title: "welcome",
+      tasks: [
+        { title: "Task 1", desc: "Description of Task 1" },
+        { title: "Task 2", desc: "Description of Task 2" },
+        { title: "Task 3", desc: "Description of Task 3" },
+      ],
+    },
+  ];
 
   return (
     <div>
-      <h1>User List</h1>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>{user.username}</li>
+      <h1 className="text-2xl">{title}</h1>
+
+      <div className="gap-4 bg-green-100 m-4 text-center flex overflow-x-auto space-x-4 p-4">
+        {cards.map((card) => (
+          <Card title={card.title} tasks={card.tasks} />
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

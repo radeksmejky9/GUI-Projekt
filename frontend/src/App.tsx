@@ -1,4 +1,3 @@
-import React from "react";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Home from "./components/UserList";
@@ -6,7 +5,7 @@ import Layout from "./components/Layout";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-const App: React.FC = () => {
+function App() {
   const router = createBrowserRouter([
     {
       path: "/",
@@ -25,6 +24,6 @@ const App: React.FC = () => {
       <RouterProvider router={router} />
     </div>
   );
-};
+}
 
 export default App;

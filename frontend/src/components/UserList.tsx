@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { User } from "../types/models";
+import Workspace from "./Workspace";
 
 const UserList: React.FC = () => {
   const [error, setError] = useState();
@@ -37,6 +38,7 @@ const UserList: React.FC = () => {
           <li key={user.id}>{user.username}</li>
         ))}
       </ul>
+      <Workspace title={"My Workspace"} />
     </div>
   );
 };
