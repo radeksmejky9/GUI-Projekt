@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 const Login: React.FC = () => {
     const [userCredentials, setUserCredentials] = useState({
@@ -17,10 +18,13 @@ const Login: React.FC = () => {
                     localStorage.removeItem('token');
                     throw new Error('Token has expired');
                 }
-            } catch (err) {
-                console.error('Token validation failed:', err);
+            } catch (e: any) {
+                console.error('Token validation failed:', e);
                 localStorage.removeItem('token');
                 setError('Session expired. Please log in again.');
+            }
+            if (token) {
+                window.location.href = '/';
             }
         }
     }, [token]);
@@ -120,7 +124,3 @@ const Login: React.FC = () => {
 };
 
 export default Login;
-function jwtDecode(token: string): any {
-    throw new Error('Function not implemented.');
-}
-
