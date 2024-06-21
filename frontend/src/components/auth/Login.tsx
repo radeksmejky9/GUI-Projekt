@@ -39,16 +39,19 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/auth/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          username: userCredentials.username,
-          password: userCredentials.password,
-        }).toString(),
-      });
+      const response = await fetch(
+        `http://${process.env.REACT_APP_CONNECTION_IP}:8000/auth/token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            username: userCredentials.username,
+            password: userCredentials.password,
+          }).toString(),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();

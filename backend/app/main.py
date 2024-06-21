@@ -13,6 +13,8 @@ app = FastAPI()
 app.include_router(auth.router)
 app.include_router(users.router)
 
+
+
 CORS_ALLOWED_ORIGIN = os.getenv("CORS_ALLOWED_ORIGIN", "*")
 CORS_ALLOWED_METHODS = os.getenv(
     "CORS_ALLOWED_METHODS", "GET, POST, PUT, DELETE, PATCH"
@@ -31,6 +33,7 @@ app.add_middleware(
 )
 
 db_dependency = Annotated[Session, Depends(get_session)]
+
 
 @app.post("/createWorkspace", response_model=Workspace)
 async def createWorkspace(token: str, session: db_dependency):

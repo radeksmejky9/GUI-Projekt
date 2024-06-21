@@ -21,13 +21,16 @@ const Register: React.FC = () => {
     e.preventDefault();
     console.log(JSON.stringify(newUser));
     try {
-      const response = await fetch("http://localhost:8000/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newUser),
-      });
+      const response = await fetch(
+        `http://${process.env.REACT_APP_CONNECTION_IP}:8000/auth`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newUser),
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to create user");
       }

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { User } from "../types/models";
 
-const UserList: React.FC = () => {
+const Workspace: React.FC = () => {
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const apiUrl = process.env.REACT_APP_CONNECTION_IP;
+
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
@@ -41,4 +42,4 @@ const UserList: React.FC = () => {
   );
 };
 
-export default UserList;
+export default Workspace;
