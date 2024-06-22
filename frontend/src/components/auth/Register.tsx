@@ -22,7 +22,7 @@ const Register: React.FC = () => {
     console.log(JSON.stringify(newUser));
     try {
       const response = await fetch(
-        `http://${process.env.REACT_APP_CONNECTION_IP}:8000/auth`,
+        `http://${process.env.REACT_APP_CONNECTION_IP}:8000/users`,
         {
           method: "POST",
           headers: {

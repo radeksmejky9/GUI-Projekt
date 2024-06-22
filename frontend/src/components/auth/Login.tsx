@@ -40,7 +40,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://${process.env.REACT_APP_CONNECTION_IP}:8000/auth/token`,
+        `http://${process.env.REACT_APP_CONNECTION_IP}:8000/token`,
         {
           method: "POST",
           headers: {
@@ -60,7 +60,7 @@ const Login: React.FC = () => {
 
       const tokenData = await response.json();
       localStorage.setItem("token", tokenData.access_token);
-      window.location.href = "/dashboard";
+      window.location.href = "/";
     } catch (error: any) {
       setError(error.message || "Login failed");
     }
