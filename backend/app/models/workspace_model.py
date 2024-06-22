@@ -19,3 +19,4 @@ class TaskModel(BaseModel):
     start_date: Union[datetime, None]
     completion_date: Union[datetime, None]
     order: Union[int, None]
+    card_id: int

@@ -242,6 +242,7 @@ function Workspace() {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((task) => task.id === activeId);
         tasks[activeIndex].card_id = overId;
+        console.log({ ...tasks[activeIndex] });
         updateTask({ ...tasks[activeIndex] }, tasks[activeIndex].id);
         return arrayMove(tasks, activeIndex, activeIndex);
       });

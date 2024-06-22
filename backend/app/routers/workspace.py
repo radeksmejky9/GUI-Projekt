@@ -143,6 +143,8 @@ async def update_task(
         task.completion_date = task_update.completion_date
     if task_update.order is not None:
         task.order = task_update.order
+    if task_update.card_id is not None:
+        task.card_id = task_update.card_id
 
     commit_and_handle_exception(session)
     refresh_and_handle_exception(session, task)
