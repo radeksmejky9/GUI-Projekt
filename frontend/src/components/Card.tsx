@@ -11,9 +11,10 @@ interface Props {
   card: CardInterface;
   tasks: TaskInterface[];
   createTask: (task: TaskCreationInterface, card_id: number) => void;
+  updateTaskContent: (id: number, field: string, value: string) => void;
 }
 
-function Card({ card, tasks, createTask }: Props) {
+function Card({ card, tasks, createTask, updateTaskContent }: Props) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.id);
   }, [tasks]);
@@ -70,7 +71,11 @@ function Card({ card, tasks, createTask }: Props) {
           {tasks
             .sort((task) => task.order)
             .map((task) => (
-              <Task key={task.id} task={task} />
+              <Task
+                key={task.id}
+                task={task}
+                updateTaskContent={updateTaskContent}
+              />
             ))}
         </SortableContext>
       </div>

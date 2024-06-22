@@ -161,9 +161,7 @@ export async function updateTask(task: TaskCreationInterface, task_id: number) {
     if (!response.ok) {
       throw new Error("Failed to update task");
     }
-
-    const createdTask: TaskInterface = await response.json();
-    console.log(createdTask);
+    return await response.json();
   } catch (error: any) {
     console.error("Error updating task:", error.message);
     throw error;

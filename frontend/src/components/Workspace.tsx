@@ -139,6 +139,7 @@ function Workspace() {
                   card={card}
                   createTask={createTask}
                   tasks={tasks.filter((task) => task.card_id === card.id)}
+                  updateTaskContent={updateTaskContent}
                 />
               ))}
           </div>
@@ -154,7 +155,9 @@ function Workspace() {
               tasks={tasks.filter((task) => task.card_name === activeCard.name)}
             />
           )*/}
-          {activeTask && <Task task={activeTask} />}
+          {activeTask && (
+            <Task task={activeTask} updateTaskContent={updateTaskContent} />
+          )}
         </DragOverlay>,
         document.body
       )}
@@ -243,7 +246,7 @@ function Workspace() {
         const activeIndex = tasks.findIndex((task) => task.id === activeId);
         tasks[activeIndex].card_id = overId;
         console.log({ ...tasks[activeIndex] });
-        if (tasks[activeIndex].card_id == cards[cards.length - 1].id) {
+        if (tasks[activeIndex].card_id === cards[cards.length - 1].id) {
           tasks[activeIndex].completion_date = new Date().toISOString();
         } else {
           tasks[activeIndex].completion_date = new Date(0).toISOString();
@@ -253,11 +256,28 @@ function Workspace() {
       });
     }
   }
+  function updateTaskContent(id: number, field: string, value: string) {
+    // Find the task to update
+    const index = tasks.findIndex((task) => task.id === id);
 
-  function reorderCards() {
-    var orderMin = 1;
-    cards.forEach((card) => (card.order = orderMin++));
+    if (index === -1) {
+      console.error(`Task with id ${id} not found.`);
+      return;
+    }
+
+    const updatedTask = { ...tasks[index] };
+    updatedTask[field] = value;
+
+    const updatedTasks = [...tasks];
+    updatedTasks[index] = updatedTask;
+
+    setTasks(updatedTasks);
+    updateTask(updatedTask, id);
   }
+  // function reorderCards() {
+  //   var orderMin = 1;
+  //   cards.forEach((card) => (card.order = orderMin++));
+  // }
 }
 
 export default Workspace;

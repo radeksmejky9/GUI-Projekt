@@ -12,6 +12,7 @@ export type TaskInterface = {
   completion_date?: string;
   card_id: number;
   order: number;
+  [key: string | number]: any;
 };
 
 export type WorkspaceInterface = {
