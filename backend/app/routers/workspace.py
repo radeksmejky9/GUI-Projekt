@@ -141,3 +141,13 @@ async def update_task(
     commit_and_handle_exception(session)
     refresh_and_handle_exception(session, task)
     return task
+
+
+@router.get("/workspaces/{workspace_id}/tasks", response_model=List[Task])
+async def get_tasks_in_workspace(
+    workspace_id: int, session: Session = Depends(get_session)
+):
+    tasks = session.exec(
+        select(Task).join(Card).where(Card.workspace_id == workspace_id)
+    ).all()
+    return tasks

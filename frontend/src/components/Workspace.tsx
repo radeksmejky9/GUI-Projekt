@@ -10,194 +10,79 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { CardInterface, Id, TaskInterface } from "../types/types";
 import { createPortal } from "react-dom";
 import Task from "./Task";
 
 type Props = {
   title: string;
+  workspace_id: number;
 };
-const defaultCards: CardInterface[] = [
-  {
-    id: "todo",
-    order: 1,
-    title: "Groceries",
-  },
-  {
-    id: "done",
-    order: 2,
-    title: "Chores",
-  },
-  {
-    id: "kek",
-    order: 3,
-    title: "Work",
-  },
-  {
-    id: "asdasd",
-    order: 4,
-    title: "Work",
-  },
-];
+const defaultCards: CardInterface[] = [];
 
-const defaultTasks: TaskInterface[] = [
-  {
-    id: 1,
-    title: "Buy groceries",
-    desc: "Buy milk, eggs, and bread from the store",
-    card_id: "todo",
-    order: 1,
-  },
-  {
-    id: 2,
-    title: "Clean kitchen",
-    desc: "Wash dishes and wipe down counters",
-    card_id: "todo",
-    order: 2,
-  },
-  {
-    id: 3,
-    title: "Finish report",
-    desc: "Complete the financial report for Q2",
-    card_id: "todo",
-    order: 3,
-  },
-  {
-    id: 4,
-    title: "Walk the dog",
-    desc: "Take the dog for a 30-minute walk",
-    card_id: "done",
-    order: 1,
-  },
-  {
-    id: 5,
-    title: "Read book",
-    desc: "Read the next chapter of the novel",
-    card_id: "done",
-    order: 2,
-  },
-  {
-    id: 6,
-    title: "Call plumber",
-    desc: "Schedule an appointment to fix the leak",
-    card_id: "done",
-    order: 3,
-  },
-  {
-    id: 7,
-    title: "Workout",
-    desc: "Do a 45-minute workout session",
-    card_id: "kek",
-    order: 1,
-  },
-  {
-    id: 8,
-    title: "Plan vacation",
-    desc: "Research and plan the summer vacation",
-    card_id: "kek",
-    order: 2,
-  },
-  {
-    id: 9,
-    title: "Grocery shopping",
-    desc: "Buy vegetables and fruits",
-    card_id: "kek",
-    order: 3,
-  },
-  {
-    id: 10,
-    title: "Pay bills",
-    desc: "Pay electricity and water bills online",
-    card_id: "kek",
-    order: 4,
-  },
-  {
-    id: 11,
-    title: "Prepare presentation",
-    desc: "Create slides for Monday's meeting",
-    card_id: "kek",
-    order: 5,
-  },
-  {
-    id: 12,
-    title: "Attend yoga class",
-    desc: "Join the evening yoga session",
-    card_id: "kek",
-    order: 6,
-  },
-  {
-    id: 13,
-    title: "Fix bike",
-    desc: "Repair the flat tire on the bicycle",
-    card_id: "kek",
-    order: 7,
-  },
-  {
-    id: 14,
-    title: "Update resume",
-    desc: "Add recent job experience to the resume",
-    card_id: "kek",
-    order: 8,
-  },
-  {
-    id: 15,
-    title: "Organize files",
-    desc: "Sort and file important documents",
-    card_id: "kek",
-    order: 9,
-  },
-  {
-    id: 16,
-    title: "Schedule meeting",
-    desc: "Arrange a team meeting for project discussion",
-    card_id: "kek",
-    order: 10,
-  },
-  {
-    id: 17,
-    title: "Write blog post",
-    desc: "Draft a new article for the blog",
-    card_id: "kek",
-    order: 11,
-  },
-  {
-    id: 18,
-    title: "Clean garage",
-    desc: "Declutter and organize the garage",
-    card_id: "kek",
-    order: 12,
-  },
-  {
-    id: 19,
-    title: "Check emails",
-    desc: "Respond to urgent emails",
-    card_id: "kek",
-    order: 13,
-  },
-  {
-    id: 20,
-    title: "Plan dinner",
-    desc: "Decide and prep for tonight's dinner",
-    card_id: "kek",
-    order: 14,
-  },
-  {
-    id: 21,
-    title: "Study for exam",
-    desc: "Review notes for the upcoming exam",
-    card_id: "kek",
-    order: 15,
-  },
-];
+const defaultTasks: TaskInterface[] = [];
 
-function Workspace({ title }: Props) {
+async function fetchCards(workspace_id: number) {
+  try {
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/cards`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch cards");
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error("Error fetching cards:", error.message);
+    throw error;
+  }
+}
+
+async function fetchTasks(workspace_id: number) {
+  try {
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/tasks`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch tasks");
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error("Error fetching tasks:", error.message);
+    throw error;
+  }
+}
+
+function Workspace({ title, workspace_id }: Props) {
   const [cards, setCards] = useState<CardInterface[]>(defaultCards);
   const [tasks, setTasks] = useState<TaskInterface[]>(defaultTasks);
   const cardsIds = useMemo(() => cards.map((card) => card.id), [cards]);
 
   const [activeCard, setActiveCard] = useState<CardInterface | null>(null);
   const [activeTask, setActiveTask] = useState<TaskInterface | null>(null);
+
+  useEffect(() => {
+    if (workspace_id) {
+      fetchCards(workspace_id)
+        .then((data) => setCards(data))
+        .catch((error) =>
+          console.error("Error fetching cards:", error.message)
+        );
+    }
+  }, [workspace_id]);
+
+  useEffect(() => {
+    console.log("cards length:", cards.length);
+    console.log("workspace_id:", workspace_id);
+
+    if (cards.length > 0 && workspace_id) {
+      fetchTasks(workspace_id)
+        .then((data) => setTasks(data))
+        .catch((error) =>
+          console.error("Error fetching tasks:", error.message)
+        );
+    }
+  }, [cards, workspace_id]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -218,7 +103,7 @@ function Workspace({ title }: Props) {
         <div>
           <h1 className="text-3xl font-bold mx-4 my-6 ml-6">{title}</h1>
         </div>
-        <div className="m-auto flex gap-4 overflow-auto">
+        <div className="m-auto flex gap-4 overflow-y-scroll">
           <SortableContext items={cardsIds}>
             <div className="m-auto flex items-center p-4">
               {cards.map((card) => (
@@ -262,8 +147,8 @@ function Workspace({ title }: Props) {
   function createTask(cardId: Id, order: number) {
     const newTask: TaskInterface = {
       id: tasks.length + 1,
-      title: "New Task",
-      desc: "Description of Task",
+      name: "New Task",
+      description: "Description of Task",
       card_id: cardId,
       order: order,
     };

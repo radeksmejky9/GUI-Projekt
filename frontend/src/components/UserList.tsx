@@ -38,7 +38,7 @@ const UserList: React.FC = () => {
           <li key={user.id}>{user.username}</li>
         ))}
       </ul>
-      <Workspace title={"My Workspace"} />
+      <Workspace title={"My Workspace"} workspace_id={1} />
     </div>
   );
 };

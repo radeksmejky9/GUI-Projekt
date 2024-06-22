@@ -12,7 +12,10 @@ function App() {
       path: "/",
       element: <Layout />,
       children: [
-        { path: "", element: <Workspace title="My Workspace" /> },
+        {
+          path: "",
+          element: <Workspace title="My Workspace" workspace_id={1} />,
+        },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
         { path: "*", element: <div>Not Found</div> },

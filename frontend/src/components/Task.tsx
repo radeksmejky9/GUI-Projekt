@@ -56,9 +56,9 @@ function Task({ task }: Props) {
       }}
       className="bg-gray-200 my-2 p-2 border-2 border-gray-800 rounded-md"
     >
-      <h1 className="text-lg text-left">{task.title}</h1>
+      <h1 className="text-lg text-left">{task.name}</h1>
       <div>
-        <span>{task.desc}</span>
+        <span>{task.description}</span>
         <span className="text-red-500">{task.order}</span>
       </div>
     </div>

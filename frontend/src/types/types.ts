@@ -1,7 +1,7 @@
 export type TaskInterface = {
   id: Id;
-  title: string;
-  desc: string;
+  name: string;
+  description: string;
   order: number;
   card_id: Id;
 };
