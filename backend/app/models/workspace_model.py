@@ -9,6 +9,7 @@ class WorkspaceModel(BaseModel):
 
 class CardModel(BaseModel):
     name: Union[str, None]
+    order: Union[int, None]
 
 
 class TaskModel(BaseModel):
@@ -17,3 +18,4 @@ class TaskModel(BaseModel):
     deadline: Union[datetime, None]
     start_date: Union[datetime, None]
     completion_date: Union[datetime, None]
+    order: Union[int, None]

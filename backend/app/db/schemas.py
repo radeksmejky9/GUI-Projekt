@@ -42,6 +42,7 @@ class Card(SQLModel, table=True):
     id: int = Field(sa_column=Column(BIGINT, primary_key=True, autoincrement=True))
     name: str
     workspace_id: int = Field(foreign_key="workspaces.id")
+    order: Optional[int] = None
 
     workspace: "Workspace" = Relationship(back_populates="cards")
     tasks: List["Task"] = Relationship(back_populates="card")
@@ -54,7 +55,8 @@ class Task(SQLModel, table=True):
     description: Optional[str] = None
     deadline: Optional[datetime] = None
     start_date: Optional[datetime] = None
-    competion_date: Optional[datetime] = None
+    completion_date: Optional[datetime] = None
     card_id: int = Field(foreign_key="cards.id")
+    order: Optional[int] = None
 
     card: "Card" = Relationship(back_populates="tasks")

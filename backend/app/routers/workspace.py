@@ -58,6 +58,7 @@ async def create_card(
     card = Card(
         name=card.name,
         workspace_id=workspace_id,
+        order=card.order,
     )
     session.add(card)
     commit_and_handle_exception(session)
@@ -83,6 +84,8 @@ async def update_card(
 
     if card_update.name is not None:
         card.name = card_update.name
+    if card_update.order is not None:
+        card.order = card_update.order
 
     commit_and_handle_exception(session)
     refresh_and_handle_exception(session, card)
@@ -98,7 +101,8 @@ async def create_task(
         description=task.description,
         deadline=task.deadline,
         start_date=task.start_date,
-        completion_status=task.completion_status,
+        completion_date=task.completion_date,
+        order=task.order,
         card_id=card_id,
     )
     session.add(task)
@@ -129,8 +133,10 @@ async def update_task(
         task.deadline = task_update.deadline
     if task_update.start_date is not None:
         task.start_date = task_update.start_date
-    if task_update.completion_status is not None:
-        task.completion_status = task_update.completion_status
+    if task_update.completion_date is not None:
+        task.completion_date = task_update.completion_date
+    if task_update.order is not None:
+        task.order = task_update.order
 
     commit_and_handle_exception(session)
     refresh_and_handle_exception(session, task)
