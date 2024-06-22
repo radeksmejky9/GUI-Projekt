@@ -15,9 +15,13 @@ function Home() {
   return (
     <div className="p-4">
       <button
+        className="bg-gray-800 text-white hover:bg-gray-900"
         onClick={() => {
           var token = localStorage.getItem("token");
-          if (token) addWorkspace({ name: "New Workspace" }, token);
+          if (token)
+            addWorkspace({ name: "New Workspace" }, token).then((data) => {
+              setWorkspaces([...workspaces, data]);
+            });
         }}
       >
         +

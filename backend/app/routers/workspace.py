@@ -8,7 +8,7 @@ from db.database import (
     refresh_and_handle_exception,
     get_session,
 )
-from models.workspace_model import WorkspaceModel, CardModel, TaskModel
+from models.workspace_model import TaskUpdateModel, WorkspaceModel, CardModel, TaskModel
 
 router = APIRouter(tags=["workspaces"])
 db_dependency = Annotated[Session, Depends(get_session)]
@@ -28,9 +28,11 @@ async def create_workspace(
     return workspace
 
 
-@router.get("/workspaces", response_model=List[Workspace])
-async def get_workspaces(session: Session = Depends(get_session)):
-    return session.exec(select(Workspace)).all()
+@router.get("/token/{token}/workspaces", response_model=List[Workspace])
+async def get_workspaces(token: str, session: Session = Depends(get_session)):
+    user_id = Token.decode_access_token(token)["user_id"]
+    workspaces = session.query(Workspace).filter_by(owner_id=user_id).all()
+    return workspaces
 
 
 @router.put("/workspaces/{workspace_id}", response_model=Workspace)
@@ -125,7 +127,7 @@ async def get_tasks_in_card(card_id: int, session: Session = Depends(get_session
 
 @router.put("/tasks/{task_id}", response_model=Task)
 async def update_task(
-    task_id: int, task_update: TaskModel, session: Session = Depends(get_session)
+    task_id: int, task_update: TaskUpdateModel, session: Session = Depends(get_session)
 ):
     task = session.get(Task, task_id)
     if not task:
@@ -139,7 +141,9 @@ async def update_task(
         task.deadline = task_update.deadline
     if task_update.start_date is not None:
         task.start_date = task_update.start_date
-    if task_update.completion_date is not None:
+    if task_update.completion_date is None:
+        task.completion_date = ""
+    else:
         task.completion_date = task_update.completion_date
     if task_update.order is not None:
         task.order = task_update.order

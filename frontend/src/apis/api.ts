@@ -3,6 +3,7 @@ import {
   TaskCreationInterface,
   TaskInterface,
   WorkspaceCreationInterface,
+  WorkspaceInterface,
 } from "../types/types";
 
 export async function fetchCards(workspace_id: number) {
@@ -38,7 +39,9 @@ export async function fetchTasks(workspace_id: number) {
 export async function fetchWorkspaces() {
   try {
     const response = await fetch(
-      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces`
+      `http://${
+        process.env.REACT_APP_CONNECTION_IP
+      }:8000/token/${localStorage.getItem("token")}/workspaces`
     );
     if (!response.ok) {
       throw new Error("Failed to fetch workspaces");
@@ -58,7 +61,8 @@ export async function fetchWorkspace(workspace_id: number) {
     if (!response.ok) {
       throw new Error("Failed to fetch workspace");
     }
-    return await response.json();
+    const createdWorkspace: WorkspaceInterface = await response.json();
+    return createdWorkspace;
   } catch (error: any) {
     console.error("Error fetching tasks:", error.message);
     throw error;
