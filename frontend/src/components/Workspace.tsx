@@ -14,9 +14,16 @@ import {
   WorkspaceInterface,
   TaskCreationInterface,
 } from "../types/types";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { addTask, fetchCards, fetchTasks, fetchWorkspace } from "../apis/api";
+import {
+  addCard,
+  addTask,
+  fetchCards,
+  fetchTasks,
+  fetchWorkspace,
+  updateTask,
+} from "../apis/api";
 import { createPortal } from "react-dom";
 import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -43,59 +50,60 @@ const defaultCards: CardInterface[] = [
     order: 4,
   },
 ];
-
-type Props = {
-  title: string;
-  workspace_id: number;
-};
+const defaultWorkspace: WorkspaceInterface = { id: "", name: "" };
 
 function Workspace() {
   /*const cardsIds = useMemo(() => cards.map((card) => card.id), [cards]);*/
   /*const [activeCard, setActiveCard] = useState<CardInterface | null>(null);*/
-  const defaultWorkspace: WorkspaceInterface = { id: "", name: "" };
 
   const [cards, setCards] = useState<CardInterface[]>([]);
   const [tasks, setTasks] = useState<TaskInterface[]>([]);
   const [workspace, setWorkspace] =
     useState<WorkspaceInterface>(defaultWorkspace);
-  const cardsIds = useMemo(() => cards.map((card) => card.id), [cards]);
   const { workspace_id } = useParams<{ workspace_id: any }>();
-  const [activeCard, setActiveCard] = useState<CardInterface | null>(null);
   const [activeTask, setActiveTask] = useState<TaskInterface | null>(null);
+  const hasAddedDefaultCards = useRef(false);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const workspaceData = await fetchWorkspace(workspace_id);
+        setWorkspace(workspaceData);
+
+        const cardsData = await fetchCards(workspace_id);
+        if (cardsData.length === 0 && !hasAddedDefaultCards.current) {
+          hasAddedDefaultCards.current = true;
+          const promises = defaultCards.map((card) =>
+            addCard({ name: card.name, order: card.order }, workspace_id)
+          );
+          await Promise.all(promises);
+          setCards(defaultCards);
+        } else {
+          setCards(cardsData);
+        }
+      } catch (error: any) {
+        console.error("Error:", error.message);
+      }
+    };
+
     if (workspace_id) {
-      fetchWorkspace(workspace_id)
-        .then((data) => setWorkspace(data))
-        .catch((error: any) =>
-          console.error("Error fetching cards:", error.message)
-        );
+      fetchData();
     }
   }, [workspace_id]);
 
   useEffect(() => {
-    if (workspace_id) {
-      fetchCards(workspace_id)
-        .then((data) => {
-          if (data.length === 0) {
-            setCards(defaultCards);
-          } else {
-            setCards(data);
-          }
-        })
-        .catch((error) =>
-          console.error("Error fetching cards:", error.message)
-        );
-    }
-  }, [workspace_id]);
+    const fetchData = async () => {
+      try {
+        const tasksData: TaskInterface[] = await fetchTasks(workspace_id);
 
-  useEffect(() => {
+        setTasks(tasksData);
+      } catch (error: any) {
+        console.error("Error:", error.message);
+      }
+    };
+
     if (cards.length > 0 && workspace_id) {
-      fetchTasks(workspace_id)
-        .then((data) => setTasks(data))
-        .catch((error: any) =>
-          console.error("Error fetching tasks:", error.message)
-        );
+      fetchData();
     }
   }, [cards, workspace_id]);
 
@@ -123,14 +131,16 @@ function Workspace() {
         <div className="m-auto flex gap-4 overflow-y-scroll">
           {/*<SortableContext items={cardsIds}>*/}
           <div className="m-auto flex items-center p-4">
-            {cards.map((card) => (
-              <Card
-                key={card.id}
-                card={card}
-                createTask={createTask}
-                tasks={tasks.filter((task) => task.card_name === card.name)}
-              />
-            ))}
+            {cards
+              .sort((a, b) => a.order - b.order)
+              .map((card) => (
+                <Card
+                  key={card.id}
+                  card={card}
+                  createTask={createTask}
+                  tasks={tasks.filter((task) => task.card_id === card.id)}
+                />
+              ))}
           </div>
           {/*</SortableContext>*/}
         </div>
@@ -161,8 +171,10 @@ function Workspace() {
   //   setCards([...cards, cardToAdd]);
   // }
 
-  function createTask(TaskCreationInterface: TaskCreationInterface) {
-    addTask(TaskCreationInterface);
+  function createTask(newTask: TaskCreationInterface, card_id: number) {
+    addTask(newTask, card_id).then((task) => {
+      setTasks([...tasks, task]);
+    });
   }
 
   function onDragStart(event: DragStartEvent) {
@@ -200,10 +212,8 @@ function Workspace() {
     if (!over) return;
 
     const activeId = active.id;
-    const overId =
-      over.data.current?.type === "Card"
-        ? over.data.current?.card.name
-        : over.id;
+    const overId = Number(over.id);
+
     if (activeId === overId) return;
 
     const isActiveATask = active.data.current?.type === "Task";
@@ -217,8 +227,8 @@ function Workspace() {
         const activeIndex = tasks.findIndex((task) => task.id === activeId);
         const overIndex = tasks.findIndex((task) => task.id === overId);
 
-        if (tasks[activeIndex].card_name !== tasks[overIndex].card_name) {
-          tasks[activeIndex].card_name = tasks[overIndex].card_name;
+        if (tasks[activeIndex].card_id !== tasks[overIndex].card_id) {
+          tasks[activeIndex].card_id = tasks[overIndex].card_id;
           return arrayMove(tasks, activeIndex, overIndex - 1);
         }
 
@@ -227,22 +237,21 @@ function Workspace() {
     }
 
     const isOverACard = over.data.current?.type === "Card";
-    if (isOverACard) console.log(over.data);
-
     // Im dropping a Task over a card
     if (isActiveATask && isOverACard) {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((task) => task.id === activeId);
-        tasks[activeIndex].card_name = overId;
+        tasks[activeIndex].card_id = overId;
+        updateTask({ ...tasks[activeIndex] }, tasks[activeIndex].id);
         return arrayMove(tasks, activeIndex, activeIndex);
       });
     }
   }
 
-  // function reorderCards() {
-  //   var orderMin = 1;
-  //   cards.forEach((card) => (card.order = orderMin++));
-  // }
+  function reorderCards() {
+    var orderMin = 1;
+    cards.forEach((card) => (card.order = orderMin++));
+  }
 }
 
 export default Workspace;

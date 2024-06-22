@@ -1,4 +1,4 @@
-import { fetchWorkspaces } from "../apis/api";
+import { addWorkspace, fetchWorkspaces } from "../apis/api";
 import { WorkspaceInterface } from "../types/types";
 import { useState, useEffect } from "react";
 
@@ -14,6 +14,14 @@ function Home() {
 
   return (
     <div className="p-4">
+      <button
+        onClick={() => {
+          var token = localStorage.getItem("token");
+          if (token) addWorkspace({ name: "New Workspace" }, token);
+        }}
+      >
+        +
+      </button>
       <h1 className="text-3xl font-bold mb-6">My Workspaces</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {workspaces.map((workspace) => (

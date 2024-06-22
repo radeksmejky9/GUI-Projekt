@@ -1,18 +1,16 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import {
   CardInterface,
-  Id,
   TaskCreationInterface,
   TaskInterface,
 } from "../types/types";
-import { CSS } from "@dnd-kit/utilities";
 import Task from "./Task";
 import { useMemo } from "react";
 
 interface Props {
   card: CardInterface;
   tasks: TaskInterface[];
-  createTask: (task: TaskCreationInterface) => void;
+  createTask: (task: TaskCreationInterface, card_id: number) => void;
 }
 
 function Card({ card, tasks, createTask }: Props) {
@@ -28,7 +26,7 @@ function Card({ card, tasks, createTask }: Props) {
     transition,
     isDragging,*/
   } = useSortable({
-    id: card.name,
+    id: card.id,
     data: {
       type: "Card",
       card,
@@ -49,7 +47,6 @@ function Card({ card, tasks, createTask }: Props) {
       ></div>
     );
   }*/
-
   reorder();
   return (
     <div
@@ -64,9 +61,7 @@ function Card({ card, tasks, createTask }: Props) {
         className="bg-lime-400 text-xl rounded-md rounded-b-none p-2 font-bold border-4 border-lime-200 justify-between flex items-center"
       >
         <div className="flex gap-2">
-          <h1 className="">
-            {card.id} | {card.name} | {card.order}
-          </h1>
+          <h1 className="">{card.name}</h1>
         </div>
       </div>
       {/* Body */}
@@ -88,10 +83,9 @@ function Card({ card, tasks, createTask }: Props) {
             deadline: new Date().toISOString(),
             start_date: new Date().toISOString(),
             completion_date: new Date().toISOString(),
-            card_id: card.id,
             order: tasks.length + 1,
           };
-          createTask(newTask);
+          createTask(newTask, card.id);
         }}
         className="items-center flex bg-lime-400 gap-2 rounded-md hover:bg-lime-500 p-2 cursor-pointer"
       >

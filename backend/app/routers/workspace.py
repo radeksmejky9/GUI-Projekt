@@ -14,7 +14,7 @@ router = APIRouter(tags=["workspaces"])
 db_dependency = Annotated[Session, Depends(get_session)]
 
 
-@router.post("/workspaces", response_model=Workspace)
+@router.post("/workspaces/{token}", response_model=Workspace)
 async def create_workspace(
     workspace: WorkspaceModel, token: str, session: Session = Depends(get_session)
 ):

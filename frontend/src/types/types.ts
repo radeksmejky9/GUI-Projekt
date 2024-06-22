@@ -1,14 +1,17 @@
 export type CardInterface = {
-  id: Id;
+  id: number;
   order: number;
   name: string;
 };
 export type TaskInterface = {
-  id: Id;
+  id: number;
   name: string;
   description: string;
+  deadline?: string;
+  start_date: string;
+  completion_date?: string;
+  card_id: number;
   order: number;
-  card_name: Id;
 };
 
 export type WorkspaceInterface = {
@@ -22,8 +25,16 @@ export type TaskCreationInterface = {
   deadline?: string;
   start_date: string;
   completion_date?: string;
-  card_id: Id;
   order: number;
+};
+
+export type CardCreationInterface = {
+  name: string;
+  order: number;
+};
+
+export type WorkspaceCreationInterface = {
+  name: string;
 };
 
 export type Id = string | number;
