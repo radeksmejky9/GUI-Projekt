@@ -23,10 +23,10 @@ const Header: React.FC = () => {
           ) : (
             <>
               <a href="/login" className="text-gray-300 hover:text-white mr-4">
-                Login
+                Sign In
               </a>
               <a href="/register" className="text-gray-300 hover:text-white">
-                Register
+                Sign Up
               </a>
             </>
           )}

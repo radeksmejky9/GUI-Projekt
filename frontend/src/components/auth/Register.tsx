@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 const Register: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [newUser, setNewUser] = useState({
     username: "",
     email: "",
@@ -33,6 +34,8 @@ const Register: React.FC = () => {
       );
       if (!response.ok) {
         throw new Error("Failed to create user");
+      } else {
+        setSuccess("Account created successfully");
       }
     } catch (e: any) {
       setError(e.message);
@@ -40,13 +43,12 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Sign Up
           </h2>
-
           {/* Username */}
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -59,14 +61,13 @@ const Register: React.FC = () => {
                 type="text"
                 autoComplete="username"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-gray-500 focus:border-gray-500 focus:z-10 sm:text-sm"
                 placeholder="Username"
                 value={newUser.username}
                 onChange={handleChange}
               />
             </div>
           </div>
-
           {/* Email */}
           <div className="rounded-md shadow-sm -space-y-px mt-4">
             <div>
@@ -79,7 +80,7 @@ const Register: React.FC = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-500 focus:border-gray-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 value={newUser.email}
                 onChange={handleChange}
@@ -99,7 +100,7 @@ const Register: React.FC = () => {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-500 focus:border-gray-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={newUser.password}
                 onChange={handleChange}
@@ -119,7 +120,7 @@ const Register: React.FC = () => {
                 type="text"
                 autoComplete="given-name"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-500 focus:border-gray-500 focus:z-10 sm:text-sm"
                 placeholder="First Name"
                 value={newUser.first_name}
                 onChange={handleChange}
@@ -139,7 +140,7 @@ const Register: React.FC = () => {
                 type="text"
                 autoComplete="family-name"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-500 focus:border-gray-500 focus:z-10 sm:text-sm"
                 placeholder="Last Name"
                 value={newUser.last_name}
                 onChange={handleChange}
@@ -159,7 +160,7 @@ const Register: React.FC = () => {
                 type="text"
                 autoComplete="url"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-500 focus:border-gray-500 focus:z-10 sm:text-sm"
                 placeholder="Profile Picture URL"
                 value={newUser.profile_picture_url}
                 onChange={handleChange}
@@ -171,13 +172,14 @@ const Register: React.FC = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mt-4"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 mt-4"
             >
               Sign Up
             </button>
           </div>
 
           {/* Error Message */}
+          {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
           {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         </form>
       </div>
