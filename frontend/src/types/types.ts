@@ -3,13 +3,13 @@ export type TaskInterface = {
   name: string;
   description: string;
   order: number;
-  card_id: Id;
+  card_name: Id;
 };
 
 export type CardInterface = {
   id: Id;
   order: number;
-  title: string;
+  name: string;
 };
 
 export type Id = string | number;

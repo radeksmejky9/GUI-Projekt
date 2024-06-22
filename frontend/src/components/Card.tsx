@@ -1,13 +1,12 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CardInterface, Id, TaskInterface } from "../types/types";
-import { CSS } from "@dnd-kit/utilities";
+import { CardInterface, TaskInterface } from "../types/types";
 import Task from "./Task";
 import { useMemo } from "react";
 
 interface Props {
   card: CardInterface;
   tasks: TaskInterface[];
-  createTask: (cardId: Id, order: number) => void;
+  createTask: (card_name: string, order: number) => void;
 }
 
 function Card({ card, tasks, createTask }: Props) {
@@ -17,20 +16,20 @@ function Card({ card, tasks, createTask }: Props) {
 
   const {
     setNodeRef,
-    attributes,
+    /*attributes,
     listeners,
     transform,
     transition,
-    isDragging,
+    isDragging,*/
   } = useSortable({
-    id: card.id,
+    id: card.name,
     data: {
       type: "Card",
       card,
     },
   });
 
-  const style = {
+  /*const style = {
     transition,
     transform: CSS.Transform.toString(transform),
   };
@@ -43,25 +42,24 @@ function Card({ card, tasks, createTask }: Props) {
         className="bg-lime-400 opacity-40 border-2 border-pink-500 w-[350px] h-[500px] max-h-[500px] rounded-md flex flex-col"
       ></div>
     );
-  }
+  }*/
 
   reorder();
-
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      /*style={style}*/
       className="bg-lime-200 w-[350px] h-[500px] max-h-[500px] rounded-md flex flex-col m-1"
     >
       {/* Header */}
       <div
-        {...attributes}
-        {...listeners}
-        className="bg-lime-400 cursor-grab text-xl rounded-md rounded-b-none p-2 font-bold border-4 border-lime-200 justify-between flex items-center"
+        /*{...attributes}
+        {...listeners}*/
+        className="bg-lime-400 text-xl rounded-md rounded-b-none p-2 font-bold border-4 border-lime-200 justify-between flex items-center"
       >
         <div className="flex gap-2">
           <h1 className="">
-            {card.title} {card.order}
+            {card.id} | {card.name} | {card.order}
           </h1>
         </div>
       </div>
@@ -77,7 +75,7 @@ function Card({ card, tasks, createTask }: Props) {
       </div>
       {/* Footer */}
       <div
-        onClick={() => createTask(card.id, tasks.length + 1)}
+        onClick={() => createTask(card.name, tasks.length + 1)}
         className="items-center flex bg-lime-400 gap-2 rounded-md hover:bg-lime-500 p-2 cursor-pointer"
       >
         Add Task
