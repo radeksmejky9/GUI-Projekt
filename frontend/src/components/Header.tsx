@@ -8,9 +8,6 @@ const Header: React.FC = () => {
           <a href="/" className="text-white text-lg font-bold">
             SFKanban
           </a>
-          <a href="/workspaces" className="text-gray-300 hover:text-white">
-            Workspaces
-          </a>
         </div>
         <div>
           {token ? (

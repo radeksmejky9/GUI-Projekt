@@ -8,11 +8,18 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
-import { useState, useEffect } from "react";
-import { CardInterface, TaskInterface } from "../types/types";
+import {
+  CardInterface,
+  TaskInterface,
+  WorkspaceInterface,
+  TaskCreationInterface,
+} from "../types/types";
+import { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+import { addTask, fetchCards, fetchTasks, fetchWorkspace } from "../apis/api";
 import { createPortal } from "react-dom";
 import Task from "./Task";
+import { arrayMove } from "@dnd-kit/sortable";
 
 const defaultCards: CardInterface[] = [
   {
@@ -41,43 +48,30 @@ type Props = {
   title: string;
   workspace_id: number;
 };
-async function fetchCards(workspace_id: number) {
-  try {
-    const response = await fetch(
-      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/cards`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch cards");
-    }
-    return await response.json();
-  } catch (error: any) {
-    console.error("Error fetching cards:", error.message);
-    throw error;
-  }
-}
 
-async function fetchTasks(workspace_id: number) {
-  try {
-    const response = await fetch(
-      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/tasks`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch tasks");
-    }
-    return await response.json();
-  } catch (error: any) {
-    console.error("Error fetching tasks:", error.message);
-    throw error;
-  }
-}
+function Workspace() {
+  /*const cardsIds = useMemo(() => cards.map((card) => card.id), [cards]);*/
+  /*const [activeCard, setActiveCard] = useState<CardInterface | null>(null);*/
+  const defaultWorkspace: WorkspaceInterface = { id: "", name: "" };
 
-function Workspace({ title, workspace_id }: Props) {
   const [cards, setCards] = useState<CardInterface[]>([]);
   const [tasks, setTasks] = useState<TaskInterface[]>([]);
-  /*const cardsIds = useMemo(() => cards.map((card) => card.id), [cards]);*/
-
-  /*const [activeCard, setActiveCard] = useState<CardInterface | null>(null);*/
+  const [workspace, setWorkspace] =
+    useState<WorkspaceInterface>(defaultWorkspace);
+  const cardsIds = useMemo(() => cards.map((card) => card.id), [cards]);
+  const { workspace_id } = useParams<{ workspace_id: any }>();
+  const [activeCard, setActiveCard] = useState<CardInterface | null>(null);
   const [activeTask, setActiveTask] = useState<TaskInterface | null>(null);
+
+  useEffect(() => {
+    if (workspace_id) {
+      fetchWorkspace(workspace_id)
+        .then((data) => setWorkspace(data))
+        .catch((error: any) =>
+          console.error("Error fetching cards:", error.message)
+        );
+    }
+  }, [workspace_id]);
 
   useEffect(() => {
     if (workspace_id) {
@@ -99,7 +93,7 @@ function Workspace({ title, workspace_id }: Props) {
     if (cards.length > 0 && workspace_id) {
       fetchTasks(workspace_id)
         .then((data) => setTasks(data))
-        .catch((error) =>
+        .catch((error: any) =>
           console.error("Error fetching tasks:", error.message)
         );
     }
@@ -122,7 +116,9 @@ function Workspace({ title, workspace_id }: Props) {
     >
       <div>
         <div>
-          <h1 className="text-3xl font-bold mx-4 my-6 ml-6">{title}</h1>
+          <h1 className="text-3xl text-center font-bold mx-4 my-6">
+            {workspace.name}
+          </h1>
         </div>
         <div className="m-auto flex gap-4 overflow-y-scroll">
           {/*<SortableContext items={cardsIds}>*/}
@@ -165,15 +161,8 @@ function Workspace({ title, workspace_id }: Props) {
   //   setCards([...cards, cardToAdd]);
   // }
 
-  function createTask(cardName: string, order: number) {
-    const newTask: TaskInterface = {
-      id: tasks.length + 1,
-      name: "New Task",
-      description: "Description of Task",
-      card_name: cardName,
-      order: order,
-    };
-    setTasks([...tasks, newTask]);
+  function createTask(TaskCreationInterface: TaskCreationInterface) {
+    addTask(TaskCreationInterface);
   }
 
   function onDragStart(event: DragStartEvent) {

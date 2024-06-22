@@ -51,6 +51,12 @@ async def update_workspace(
     return workspace
 
 
+@router.get("/workspaces/{workspace_id}", response_model=Workspace)
+async def get_workspace(workspace_id: int, session: Session = Depends(get_session)):
+    workspace = session.get(Workspace, workspace_id)
+    return workspace
+
+
 @router.post("/workspaces/{workspace_id}/cards", response_model=Card)
 async def create_card(
     card: CardModel, workspace_id: int, session: Session = Depends(get_session)

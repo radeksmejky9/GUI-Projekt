@@ -1,12 +1,18 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CardInterface, TaskInterface } from "../types/types";
+import {
+  CardInterface,
+  Id,
+  TaskCreationInterface,
+  TaskInterface,
+} from "../types/types";
+import { CSS } from "@dnd-kit/utilities";
 import Task from "./Task";
 import { useMemo } from "react";
 
 interface Props {
   card: CardInterface;
   tasks: TaskInterface[];
-  createTask: (card_name: string, order: number) => void;
+  createTask: (task: TaskCreationInterface) => void;
 }
 
 function Card({ card, tasks, createTask }: Props) {
@@ -75,7 +81,18 @@ function Card({ card, tasks, createTask }: Props) {
       </div>
       {/* Footer */}
       <div
-        onClick={() => createTask(card.name, tasks.length + 1)}
+        onClick={() => {
+          const newTask: TaskCreationInterface = {
+            name: "TASK123123123123",
+            description: "TASKHAHAHA",
+            deadline: new Date().toISOString(),
+            start_date: new Date().toISOString(),
+            completion_date: new Date().toISOString(),
+            card_id: card.id,
+            order: tasks.length + 1,
+          };
+          createTask(newTask);
+        }}
         className="items-center flex bg-lime-400 gap-2 rounded-md hover:bg-lime-500 p-2 cursor-pointer"
       >
         Add Task

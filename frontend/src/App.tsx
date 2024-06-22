@@ -1,8 +1,7 @@
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
-import Home from "./components/UserList";
+import Home from "./components/Home";
 import Layout from "./components/Layout";
-
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Workspace from "./components/Workspace";
 
@@ -14,7 +13,11 @@ function App() {
       children: [
         {
           path: "",
-          element: <Workspace title="My Workspace" workspace_id={1} />,
+          element: <Home />,
+        },
+        {
+          path: "workspace/:workspace_id",
+          element: <Workspace />,
         },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
