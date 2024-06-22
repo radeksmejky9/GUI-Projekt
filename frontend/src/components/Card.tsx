@@ -53,13 +53,13 @@ function Card({ card, tasks, createTask, updateTaskContent }: Props) {
     <div
       ref={setNodeRef}
       /*style={style}*/
-      className="bg-lime-200 w-[350px] h-[500px] max-h-[500px] rounded-md flex flex-col m-1"
+      className="bg-gray-200 w-[350px] h-[500px] max-h-[500px] rounded-md flex flex-col m-1"
     >
       {/* Header */}
       <div
         /*{...attributes}
         {...listeners}*/
-        className="bg-lime-400 text-xl rounded-md rounded-b-none p-2 font-bold border-4 border-lime-200 justify-between flex items-center"
+        className="bg-gray-400 text-xl rounded-md rounded-b-none p-2 font-bold border-4 border-gray-200 justify-between flex items-center"
       >
         <div className="flex gap-2">
           <h1 className="">{card.name}</h1>
@@ -92,7 +92,7 @@ function Card({ card, tasks, createTask, updateTaskContent }: Props) {
           };
           createTask(newTask, card.id);
         }}
-        className="items-center flex bg-lime-400 gap-2 rounded-md hover:bg-lime-500 p-2 cursor-pointer"
+        className="items-center flex bg-gray-400 gap-2 rounded-md hover:bg-lime-500 p-2 cursor-pointer"
       >
         Add Task
       </div>

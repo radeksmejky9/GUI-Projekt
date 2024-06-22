@@ -23,6 +23,7 @@ import {
   fetchTasks,
   fetchWorkspace,
   updateTask,
+  updateWorkspace,
 } from "../apis/api";
 import { createPortal } from "react-dom";
 import Task from "./Task";
@@ -50,19 +51,28 @@ const defaultCards: CardInterface[] = [
     order: 4,
   },
 ];
-const defaultWorkspace: WorkspaceInterface = { id: "", name: "" };
+const defaultWorkspace: WorkspaceInterface = {
+  id: -1,
+  name: "you should not see this",
+};
 
 function Workspace() {
   /*const cardsIds = useMemo(() => cards.map((card) => card.id), [cards]);*/
   /*const [activeCard, setActiveCard] = useState<CardInterface | null>(null);*/
 
+  const { workspace_id } = useParams<{ workspace_id: any }>();
   const [cards, setCards] = useState<CardInterface[]>([]);
   const [tasks, setTasks] = useState<TaskInterface[]>([]);
   const [workspace, setWorkspace] =
     useState<WorkspaceInterface>(defaultWorkspace);
-  const { workspace_id } = useParams<{ workspace_id: any }>();
   const [activeTask, setActiveTask] = useState<TaskInterface | null>(null);
   const hasAddedDefaultCards = useRef(false);
+
+  const [editMode, setEditMode] = useState(false);
+
+  const toggleEditMode = () => {
+    setEditMode((prev) => !prev);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,21 +125,72 @@ function Workspace() {
     })
   );
   //reorderCards();
+
+  if (editMode) {
+    return (
+      <DndContext
+        onDragStart={onDragStart}
+        onDragOver={onDragOver}
+        sensors={sensors}
+      >
+        <div>
+          <div className="text-center items-center mt-6">
+            <input
+              autoFocus
+              className="text-center text-4xl w-full outline-none text-red-500 pb-2"
+              onChange={(e) =>
+                updateWorkspaceName(workspace.id, e.target.value)
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  toggleEditMode();
+                }
+              }}
+              defaultValue={workspace.name}
+            />
+            <div className="w-1/2 m-auto h-[1px] bg-red-500"></div>
+          </div>
+          <div className="m-auto flex gap-4 overflow-y-scroll">
+            <div className="m-auto flex items-center p-4">
+              {cards
+                .sort((a, b) => a.order - b.order)
+                .map((card) => (
+                  <Card
+                    key={card.id}
+                    card={card}
+                    createTask={createTask}
+                    tasks={tasks.filter((task) => task.card_id === card.id)}
+                    updateTaskContent={updateTaskContent}
+                  />
+                ))}
+            </div>
+          </div>
+        </div>
+        {createPortal(
+          <DragOverlay>
+            {activeTask && (
+              <Task task={activeTask} updateTaskContent={updateTaskContent} />
+            )}
+          </DragOverlay>,
+          document.body
+        )}
+      </DndContext>
+    );
+  }
+
   return (
     <DndContext
       onDragStart={onDragStart}
-      /*onDragEnd={onDragEnd}*/
       onDragOver={onDragOver}
       sensors={sensors}
     >
       <div>
-        <div>
-          <h1 className="text-3xl text-center font-bold mx-4 my-6">
+        <div className="text-center mt-6 " onClick={toggleEditMode}>
+          <h1 className="text-4xl border-b inline-block pb-2 border-black">
             {workspace.name}
           </h1>
         </div>
         <div className="m-auto flex gap-4 overflow-y-scroll">
-          {/*<SortableContext items={cardsIds}>*/}
           <div className="m-auto flex items-center p-4">
             {cards
               .sort((a, b) => a.order - b.order)
@@ -143,18 +204,10 @@ function Workspace() {
                 />
               ))}
           </div>
-          {/*</SortableContext>*/}
         </div>
       </div>
       {createPortal(
         <DragOverlay>
-          {/*activeCard && (
-            <Card
-              card={activeCard}
-              createTask={createTask}
-              tasks={tasks.filter((task) => task.card_name === activeCard.name)}
-            />
-          )*/}
           {activeTask && (
             <Task task={activeTask} updateTaskContent={updateTaskContent} />
           )}
@@ -274,10 +327,17 @@ function Workspace() {
     setTasks(updatedTasks);
     updateTask(updatedTask, id);
   }
+
   // function reorderCards() {
   //   var orderMin = 1;
   //   cards.forEach((card) => (card.order = orderMin++));
   // }
+
+  function updateWorkspaceName(id: number, value: string) {
+    workspace.name = value.trim();
+    updateWorkspace(workspace, id);
+    setWorkspace(workspace);
+  }
 }
 
 export default Workspace;

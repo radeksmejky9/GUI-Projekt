@@ -16,7 +16,7 @@ export type TaskInterface = {
 };
 
 export type WorkspaceInterface = {
-  id: Id;
+  id: number;
   name: string;
 };
 

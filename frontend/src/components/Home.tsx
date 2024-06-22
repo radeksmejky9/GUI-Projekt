@@ -21,7 +21,9 @@ function Home() {
               key={workspace.id}
               className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow duration-300"
             >
-              <h2 className="text-xl mb-4 font-semibold">{workspace.name}</h2>
+              <h2 className="text-xl mb-4 font-semibold break-all overflow-y-auto max-h-[100px]">
+                {workspace.name}
+              </h2>
               <a
                 href={`/workspace/${workspace.id}`}
                 className="mt-4 px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-900"

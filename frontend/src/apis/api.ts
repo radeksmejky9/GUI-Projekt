@@ -167,3 +167,29 @@ export async function updateTask(task: TaskCreationInterface, task_id: number) {
     throw error;
   }
 }
+
+export async function updateWorkspace(
+  workspace: WorkspaceCreationInterface,
+  workspace_id: number
+) {
+  try {
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(workspace),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update task");
+    }
+    return await response.json();
+  } catch (error: any) {
+    console.error("Error updating task:", error.message);
+    throw error;
+  }
+}
