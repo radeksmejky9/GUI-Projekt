@@ -1,11 +1,15 @@
 export type TaskInterface = {
-  id: number;
+  id: Id;
   title: string;
   desc: string;
+  order: number;
+  card_id: Id;
 };
 
 export type CardInterface = {
-  id: number;
+  id: Id;
+  order: number;
   title: string;
-  tasks: TaskInterface[];
 };
+
+export type Id = string | number;
