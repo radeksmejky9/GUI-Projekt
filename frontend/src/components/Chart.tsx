@@ -16,15 +16,84 @@ interface Props {
   tasks: TaskInterface[];
 }
 
-const Chart: React.FC<Props> = ({ tasks }) => {
-  const calculateBurnDownData = (
+function Chart({ workspace_id, tasks }: Props) {
+  const burnDownData = calculateBurnDownData(tasks);
+  const velocityData = calculateVelocityData(tasks);
+
+  const [isHidden, setIsHidden] = React.useState(true);
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsHidden(!isHidden)}
+        className="bg-gray-800 p-2 text-center flex text-white rounded-r-md hover:bg-gray-900 mt-4 justify-start"
+      >
+        {isHidden ? (
+          <p className="pr-2">Show Graphs</p>
+        ) : (
+          <p className="pr-2">Hide Graphs</p>
+        )}
+      </button>
+
+      {!isHidden && (
+        <div className="grid pt-12 grid-cols-1 w-1/2 gap-6">
+          <div className="bg-white p-4 rounded-lg shadow-md text-gray-800">
+            <h2 className="text-xl ml-4 font-bold mb-4">Burn-down Chart</h2>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={burnDownData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                  <XAxis dataKey="date" stroke="#ccc" />
+                  <YAxis stroke="#ccc" />
+                  <Tooltip
+                    formatter={(value, name, props) => [
+                      `${value} tasks remaining`,
+                      "",
+                    ]}
+                  />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="remaining"
+                    stroke="#8884d8"
+                    fill="#8884d8"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded-lg shadow-md text-gray-800">
+            <h2 className="text-xl font-bold ml-4 mb-4">Velocity Chart</h2>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={velocityData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+                  <XAxis dataKey="date" stroke="#ccc" />
+                  <YAxis stroke="#ccc" />
+                  <Tooltip />
+                  <Legend />
+                  <Line
+                    type="monotone"
+                    dataKey="velocity"
+                    stroke="#82ca9d"
+                    dot={{ strokeWidth: 3, r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  function calculateBurnDownData(
     tasksData: TaskInterface[]
-  ): { date: string; remaining: number }[] => {
-    {
-      console.log(tasksData);
-    }
+  ): { date: string; remaining: number }[] {
     let endDate = new Date();
     endDate.setHours(0, 0, 0, 0);
+
     let currentDate = new Date(tasksData[0].start_date);
     let totalDays = Math.ceil(
       (endDate.getTime() - currentDate.getTime()) / (1000 * 3600 * 24)
@@ -56,11 +125,11 @@ const Chart: React.FC<Props> = ({ tasks }) => {
     }
 
     return burnDownData;
-  };
+  }
 
-  const calculateVelocityData = (
+  function calculateVelocityData(
     tasksData: TaskInterface[]
-  ): { date: string; velocity: number }[] => {
+  ): { date: string; velocity: number }[] {
     let velocityData: { date: string; velocity: number }[] = [];
     let cumulativeCompleted = 0;
     tasksData.forEach((task) => {
@@ -77,80 +146,7 @@ const Chart: React.FC<Props> = ({ tasks }) => {
     });
 
     return velocityData;
-  };
-
-  const burnDownData = calculateBurnDownData(tasks);
-  const velocityData = calculateVelocityData(tasks);
-
-  const [isHidden, setIsHidden] = React.useState(true);
-
-  return (
-    <div>
-      <button
-        onClick={() => setIsHidden(!isHidden)}
-        className="bg-gray-800 p-2 text-center flex text-white rounded-r-md hover:bg-gray-900 mt-4 justify-start"
-      >
-        {isHidden ? (
-          <p className="pr-2">Show Graphs</p>
-        ) : (
-          <p className="pr-2">Hide Graphs</p>
-        )}
-      </button>
-
-      <div
-        className={`grid pt-12 grid-cols-1 w-1/2 gap-6 ${
-          isHidden ? "hidden" : ""
-        }`}
-      >
-        <div className="bg-white p-4 rounded-lg shadow-md text-gray-800">
-          <h2 className="text-xl ml-4 font-bold mb-4">Burn-down Chart</h2>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={burnDownData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-                <XAxis dataKey="date" stroke="#ccc" />
-                <YAxis stroke="#ccc" />
-                <Tooltip
-                  formatter={(value, name, props) => [
-                    `${value} tasks remaining`,
-                    "",
-                  ]}
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="remaining"
-                  stroke="#8884d8"
-                  fill="#8884d8"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-white p-4  rounded-lg shadow-md text-gray-800">
-          <h2 className="text-xl  font-bold ml-4 mb-4">Velocity Chart</h2>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={velocityData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-                <XAxis dataKey="date" stroke="#ccc" />
-                <YAxis stroke="#ccc" />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="velocity"
-                  stroke="#82ca9d"
-                  dot={{ strokeWidth: 3, r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+  }
+}
 
 export default Chart;

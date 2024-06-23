@@ -35,7 +35,7 @@ function SelectUserModal({
           console.error("Error fetching users:", error);
         });
     }
-  }, [isOpen, getUsers, users]);
+  }, [isOpen, getUsers, users, toggleUserSelection]);
 
   return (
     <Modal

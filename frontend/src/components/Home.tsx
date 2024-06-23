@@ -26,7 +26,7 @@ function Home() {
     fetchWorkspaces()
       .then((data) => setWorkspaces(data))
       .catch((error: any) =>
-        console.error("Error fetching cards:", error.message)
+        console.error("Error fetching workspaces:", error.message)
       );
   }, []);
 

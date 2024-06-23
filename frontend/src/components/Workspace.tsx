@@ -121,14 +121,12 @@ function Workspace() {
     })
   );
 
-  //reorderCards();
   if (token != null) {
     const decodedToken = jwtDecode<JwtPayload>(token);
     return (
       <div className="">
         {tasks.length > 0 && workspace_id && (
-          /*<Chart workspace_id={workspace_id} tasks={tasks} />*/
-          <></>
+          <Chart workspace_id={workspace_id} tasks={tasks} />
         )}
         <DndContext
           onDragStart={onDragStart}
@@ -255,9 +253,10 @@ function Workspace() {
 
         if (tasks[activeIndex].card_name !== tasks[overIndex].card_name) {
           tasks[activeIndex].card_name = tasks[overIndex].card_name;
+          updateTask({ ...tasks[activeIndex] }, tasks[activeIndex].id);
           return arrayMove(tasks, activeIndex, overIndex - 1);
         }
-
+        updateTask({ ...tasks[activeIndex] }, tasks[activeIndex].id);
         return arrayMove(tasks, activeIndex, overIndex);
       });
     }
