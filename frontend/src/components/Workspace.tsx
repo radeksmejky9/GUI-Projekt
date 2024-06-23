@@ -33,7 +33,7 @@ import {
 import { createPortal } from "react-dom";
 import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
-import TrashIcon from "../icons/TrashIcon";
+import TrashIcon from "./icons/TrashIcon";
 import Chart from "./Chart";
 import SelectUserModal from "./SelectUserModal";
 

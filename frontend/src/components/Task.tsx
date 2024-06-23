@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskInterface } from "../types/types";
 import { useState } from "react";
-import TrashIcon from "../icons/TrashIcon";
+import TrashIcon from "./icons/TrashIcon";
 
 type Props = {
   task: TaskInterface;

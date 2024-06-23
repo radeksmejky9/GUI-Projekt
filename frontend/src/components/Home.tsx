@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "jsonwebtoken";
 import { addWorkspace, deleteWorkspace, fetchWorkspaces } from "../apis/api";
-import TrashIcon from "../icons/TrashIcon";
+import TrashIcon from "./icons/TrashIcon";
 import { WorkspaceInterface } from "../types/types";
 import { useState, useEffect } from "react";
 
