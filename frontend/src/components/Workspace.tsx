@@ -234,6 +234,14 @@ function Workspace() {
         </DndContext>
       </div>
     );
+  } else {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <h1 className="text-6xl text-center">
+          Please login to use this feature!
+        </h1>
+      </div>
+    );
   }
   // function createNewCard(id: Id, name: string = "New Card", order: number) {
   //   const cardToAdd: CardInterface = {
