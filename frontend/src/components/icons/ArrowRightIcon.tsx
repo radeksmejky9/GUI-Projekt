@@ -1,6 +1,4 @@
 function ArrowRightIcon() {
-  const token = localStorage.getItem("token");
-
   return (
     <div>
       <svg

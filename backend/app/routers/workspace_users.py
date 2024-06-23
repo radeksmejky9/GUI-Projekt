@@ -12,10 +12,10 @@ router = APIRouter(tags=["workspace_users"])
 db_dependency = Annotated[Session, Depends(get_session)]
 
 
-@router.get("/workspaces/{workspace_id}/users", response_model=List[WorkspaceUser])
+@router.get("/workspaces/{workspace_id}/users", response_model=List[User])
 async def get_workspaceUsers(workspace_id: int, session: db_dependency):
     users = session.exec(
-        select(WorkspaceUser).where(WorkspaceUser.workspace_id == workspace_id)
+        select(User).join(WorkspaceUser).where(WorkspaceUser.workspace_id == workspace_id)
     ).all()
     return users
 

@@ -86,6 +86,7 @@ function Workspace() {
         setWorkspace(workspaceData);
 
         const workspaceUsers = await fetchWorkspaceUsers(workspace_id);
+        console.log(workspaceUsers);
         SetUsers(workspaceUsers);
       } catch (error: any) {
         console.error("Error:", error.message);
@@ -150,24 +151,51 @@ function Workspace() {
                   defaultValue={workspace.name}
                 />
                 <div className="w-1/2 m-auto h-[1px] bg-red-500"></div>
-              </div>
-            ) : (
-              <div className="text-center mt-6">
-                <h1
-                  onClick={toggleEditMode}
-                  className="text-4xl border-b inline-block pb-2 border-black"
-                >
-                  {workspace.name}
-                </h1>
-
                 {workspace.owner_id === decodedToken.id && (
-                  <div className="text-3xl">
-                    <button onClick={() => openModal()}>Add User</button>
+                  <div className="text-2xl">
+                    <button
+                      className="font-bold py-2 px-4"
+                      onClick={() => openModal()}
+                    >
+                      Add Users
+                    </button>
                     <SelectUserModal
                       users={users}
                       getUsers={getUsers}
                       isOpen={modalIsOpen}
-                      onAfterOpen={() => {}}
+                      onRequestAddUsers={addUsers}
+                      onRequestClose={closeModal}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center my-6">
+                {workspace.owner_id === decodedToken.id ? (
+                  <h1
+                    onClick={toggleEditMode}
+                    className="text-4xl border-b inline-block pb-2 border-black cursor-pointer"
+                  >
+                    {workspace.name}
+                  </h1>
+                ) : (
+                  <h1 className="text-4xl border-b inline-block pb-2 border-black">
+                    {workspace.name}
+                  </h1>
+                )}
+
+                {workspace.owner_id === decodedToken.id && (
+                  <div className="text-2xl">
+                    <button
+                      className="font-bold py-2 px-4"
+                      onClick={() => openModal()}
+                    >
+                      Add Users
+                    </button>
+                    <SelectUserModal
+                      users={users}
+                      getUsers={getUsers}
+                      isOpen={modalIsOpen}
                       onRequestAddUsers={addUsers}
                       onRequestClose={closeModal}
                     />
@@ -254,6 +282,9 @@ function Workspace() {
         if (tasks[activeIndex].card_name !== tasks[overIndex].card_name) {
           tasks[activeIndex].card_name = tasks[overIndex].card_name;
           updateTask({ ...tasks[activeIndex] }, tasks[activeIndex].id);
+          if (tasks[activeIndex].card_name === cards[cards.length - 1].name) {
+            tasks[activeIndex].completion_date = new Date().toISOString();
+          }
           return arrayMove(tasks, activeIndex, overIndex - 1);
         }
         updateTask({ ...tasks[activeIndex] }, tasks[activeIndex].id);
