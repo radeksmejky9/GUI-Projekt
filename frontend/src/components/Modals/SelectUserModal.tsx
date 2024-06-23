@@ -6,7 +6,6 @@ interface Props {
   users: UserInterface[];
   getUsers: () => Promise<UserInterface[]>;
   isOpen: boolean;
-  onAfterOpen: () => void;
   onRequestAddUsers: (users: UserInterface[]) => void;
   onRequestClose: () => void;
 }
@@ -15,7 +14,6 @@ function SelectUserModal({
   users,
   getUsers,
   isOpen,
-  onAfterOpen,
   onRequestAddUsers,
   onRequestClose,
 }: Props) {
@@ -24,24 +22,24 @@ function SelectUserModal({
 
   useEffect(() => {
     if (isOpen) {
+      console.log(users);
       getUsers()
         .then((fetchedUsers: UserInterface[]) => {
           setAllUsers(fetchedUsers);
-          users.forEach((user) => {
-            toggleUserSelection(user);
-          });
         })
         .catch((error: any) => {
           console.error("Error fetching users:", error);
         });
+      users.forEach((user) => {
+        toggleUserSelection(user);
+      });
     }
-  }, [isOpen, getUsers, users, toggleUserSelection]);
+  }, [isOpen, getUsers, users]);
 
   return (
     <Modal
       ariaHideApp={false}
       isOpen={isOpen}
-      onAfterOpen={onAfterOpen}
       onRequestClose={onRequestClose}
       contentLabel="Select Users Modal"
       className="fixed inset-0 flex items-center justify-center"
@@ -89,7 +87,6 @@ function SelectUserModal({
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
             onClick={() => {
-              console.log("Selected Users: ", selectedUsers);
               onRequestAddUsers(selectedUsers);
               onRequestClose();
             }}

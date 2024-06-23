@@ -45,7 +45,7 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
       <div
         ref={setNodeRef}
         style={style}
-        className="opacity-30 my-2 p-4 max-h-[100px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-rose-500  cursor-grab relative "
+        className="opacity-30 my-2 p-4 max-h-[160px] min-h-[160px] items-center flex text-left rounded-xl border-2 border-rose-500  cursor-grab relative "
       />
     );
   }
@@ -101,7 +101,7 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
             updateTaskContent(
               task.id,
               "start_date",
-              new Date(new Date(e.target.value).getTime()).toISOString()
+              new Date(e.target.value).toISOString()
             )
           }
           onKeyDown={(e) => {
@@ -116,7 +116,7 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
         <input
           type="date"
           className="text-lg text-left text-gray-800 border border-gray-300 outline-none w-full px-3 py-2 mb-3 rounded-md"
-          defaultValue={new Date(task.deadline).toLocaleDateString()}
+          defaultValue={new Date(task.deadline).toISOString().split("T")[0]}
           onChange={(e) =>
             updateTaskContent(
               task.id,
@@ -133,7 +133,6 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
       </div>
     );
   }
-  console.log(task.start_date);
   return (
     <div
       ref={setNodeRef}
@@ -147,7 +146,7 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
       onMouseLeave={() => {
         setMouseIsOver(false);
       }}
-      className=" relative bg-gray-200 my-2 p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out"
+      className=" relative max-h-[160px] min-h-[160px] bg-gray-200 my-2 p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out"
     >
       <h1 className="text-lg font-semibold text-left text-gray-800">
         {task.name}

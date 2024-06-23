@@ -21,6 +21,7 @@ export async function deleteTask(task_id: number) {
 export async function deleteUsersFromWorkspace(workspace_id: number) {
   try {
     await deleteData(`/workspaces/${workspace_id}/users`);
+    console.log("kek");
     return { "Message:": "Users from workspace deleted succesfully." };
   } catch (error: any) {
     console.error(error.message);
