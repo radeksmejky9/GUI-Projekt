@@ -283,7 +283,7 @@ function Workspace() {
       console.error(`Task with id ${id} not found.`);
       return;
     }
-
+    console.log(value);
     const updatedTask = { ...tasks[index] };
     updatedTask[field] = value;
 
