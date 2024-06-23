@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
-import { UserInterface } from "../types/types";
-import { useResizeObserver } from "@dnd-kit/core/dist/hooks/utilities";
+import { UserInterface } from "../../types/types";
 
 interface Props {
   users: UserInterface[];
@@ -27,7 +26,6 @@ function SelectUserModal({
     if (isOpen) {
       getUsers()
         .then((fetchedUsers: UserInterface[]) => {
-          console.log(users);
           setAllUsers(fetchedUsers);
           users.forEach((user) => {
             toggleUserSelection(user);

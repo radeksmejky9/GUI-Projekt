@@ -4,9 +4,21 @@ import { addWorkspace, deleteWorkspace, fetchWorkspaces } from "../apis/api";
 import TrashIcon from "./icons/TrashIcon";
 import { WorkspaceInterface } from "../types/types";
 import { useState, useEffect } from "react";
+import DeleteWorkspaceModal from "./Modals/DeleteWorkspaceModal";
 
 function Home() {
   const [workspaces, setWorkspaces] = useState<WorkspaceInterface[]>([]);
+  const [workspaceToDelete, setWorkspaceToDelete] = useState<number | null>(
+    null
+  );
+
+  const openModal = (workspaceId: number) => {
+    setWorkspaceToDelete(workspaceId);
+  };
+
+  const closeModal = () => {
+    setWorkspaceToDelete(null);
+  };
 
   useEffect(() => {
     fetchWorkspaces()
@@ -34,22 +46,14 @@ function Home() {
                   {workspace.name}
                 </h2>
                 {decodedToken.id === workspace.owner_id && (
-                  <button
-                    className="p-3 stroke-black"
-                    onClick={() => {
-                      const confirmDelete = window.confirm(
-                        "Are you sure you want to delete this workspace?"
-                      );
-                      if (confirmDelete) {
-                        deleteWorkspace(workspace.id);
-                        setWorkspaces(
-                          workspaces.filter((w) => w.id !== workspace.id)
-                        );
-                      }
-                    }}
-                  >
-                    <TrashIcon />
-                  </button>
+                  <div>
+                    <button
+                      className="top-2 right-2 p-1 stroke-red-500 border-2 border-red-500 rounded-full hover:bg-red-600 hover:border-red-600 hover:stroke-white transition-colors duration-200 ease-in-out"
+                      onClick={() => openModal(workspace.id)}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
                 )}
               </div>
               <a
@@ -61,6 +65,16 @@ function Home() {
             </div>
           ))}
         </div>
+
+        {workspaceToDelete && (
+          // Use optional chaining (?.) to safely access properties
+          <DeleteWorkspaceModal
+            workspace={workspaces.find((w) => w.id === workspaceToDelete)}
+            isOpen={true}
+            onRequestDelete={removeWorkspace}
+            onRequestClose={closeModal}
+          />
+        )}
 
         <div className="fixed bottom-0 right-0 m-8">
           <button
@@ -84,6 +98,13 @@ function Home() {
         Please login to use this feature!
       </div>
     );
+
+  function removeWorkspace(workspace: WorkspaceInterface) {
+    deleteWorkspace(workspace.id).then(() => {
+      setWorkspaces(workspaces.filter((w) => w.id !== workspace.id));
+      closeModal();
+    });
+  }
 }
 
 export default Home;

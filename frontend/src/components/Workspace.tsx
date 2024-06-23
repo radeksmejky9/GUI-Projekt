@@ -34,9 +34,8 @@ import {
 import { createPortal } from "react-dom";
 import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
-import TrashIcon from "./icons/TrashIcon";
 import Chart from "./Chart";
-import SelectUserModal from "./SelectUserModal";
+import SelectUserModal from "./Modals/SelectUserModal";
 
 const defaultCards: CardInterface[] = [
   {
@@ -67,9 +66,6 @@ const defaultWorkspace: WorkspaceInterface = {
 };
 
 function Workspace() {
-  /*const cardsIds = useMemo(() => cards.map((card) => card.id), [cards]);*/
-  /*const [activeCard, setActiveCard] = useState<CardInterface | null>(null);*/
-
   const { workspace_id } = useParams<{ workspace_id: any }>();
   const [users, SetUsers] = useState<UserInterface[]>([]);
   const [cards, setCards] = useState<CardInterface[]>([]);
@@ -148,8 +144,6 @@ function Workspace() {
       },
     })
   );
-
-  //reorderCards();
 
   return (
     <div className="">
@@ -233,16 +227,6 @@ function Workspace() {
     </div>
   );
 
-  // function createNewCard(id: Id, name: string = "New Card", order: number) {
-  //   const cardToAdd: CardInterface = {
-  //     id: id,
-  //     name: name,
-  //     order: order,
-  //   };
-
-  //   setCards([...cards, cardToAdd]);
-  // }
-
   function createTask(newTask: TaskCreationInterface, card_id: number) {
     addTask(newTask, card_id).then((task) => {
       setTasks([...tasks, task]);
@@ -250,35 +234,12 @@ function Workspace() {
   }
 
   function onDragStart(event: DragStartEvent) {
-    /*if (event.active.data.current?.type === "Card") {
-      setActiveCard(event.active.data.current.card);
-      return;
-    }*/
-
     if (event.active.data.current?.type === "Task") {
       setActiveTask(event.active.data.current.task);
       return;
     }
   }
 
-  // function onDragEnd(event: DragEndEvent) {
-  //   setActiveCard(null);
-  //   setActiveTask(null);
-
-  //   const { active, over } = event;
-  //   if (!over) return;
-
-  //   const activeId = active.id;
-  //   const overId = over.id;
-
-  //   if (activeId === overId) return;
-
-  //   setCards((cards) => {
-  //     const activeColumnIndex = cards.findIndex((card) => card.id === activeId);
-  //     const overColumnIndex = cards.findIndex((card) => card.id === overId);
-  //     return arrayMove(cards, activeColumnIndex, overColumnIndex);
-  //   });
-  // }
   function onDragOver(event: DragOverEvent) {
     const { active, over } = event;
     if (!over) return;
@@ -293,7 +254,6 @@ function Workspace() {
 
     if (!isActiveATask) return;
 
-    // Im dropping a Task over another Task
     if (isActiveATask && isOverATask) {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((task) => task.id === activeId);
@@ -343,11 +303,6 @@ function Workspace() {
     setTasks(updatedTasks);
     updateTask(updatedTask, id);
   }
-
-  // function reorderCards() {
-  //   var orderMin = 1;
-  //   cards.forEach((card) => (card.order = orderMin++));
-  // }
 
   function updateWorkspaceName(id: number, value: string) {
     workspace.name = value.trim();
