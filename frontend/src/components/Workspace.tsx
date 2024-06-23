@@ -35,7 +35,9 @@ import { createPortal } from "react-dom";
 import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
 import Chart from "./Chart";
-import SelectUserModal from "./Modals/SelectUserModal";
+import SelectUserModal from "./modals/SelectUserModal";
+import { jwtDecode } from "jwt-decode";
+import { JwtPayload } from "jsonwebtoken";
 
 const defaultCards: CardInterface[] = [
   {
@@ -50,7 +52,7 @@ const defaultCards: CardInterface[] = [
   },
   {
     id: 3,
-    name: "Bugs",
+    name: "Testing",
     order: 3,
   },
   {
@@ -74,7 +76,6 @@ function Workspace() {
     useState<WorkspaceInterface>(defaultWorkspace);
   const [activeTask, setActiveTask] = useState<TaskInterface | null>(null);
   const hasAddedDefaultCards = useRef(false);
-
   const [modalIsOpen, setIsOpen] = useState(false);
 
   const openModal = () => {
@@ -90,142 +91,159 @@ function Workspace() {
   const toggleEditMode = () => {
     setEditMode((prev) => !prev);
   };
+  const token = localStorage.getItem("token");
+  if (token != null) {
+    const decodedToken = jwtDecode<JwtPayload>(token);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const workspaceData = await fetchWorkspace(workspace_id);
+          setWorkspace(workspaceData);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const workspaceData = await fetchWorkspace(workspace_id);
-        setWorkspace(workspaceData);
+          const cardsData = await fetchCards(workspace_id);
+          if (cardsData.length === 0 && !hasAddedDefaultCards.current) {
+            hasAddedDefaultCards.current = true;
+            const promises = defaultCards.map((card) =>
+              addCard({ name: card.name, order: card.order }, workspace_id)
+            );
+            await Promise.all(promises);
+            setCards(defaultCards);
+          } else {
+            setCards(cardsData);
+          }
 
-        const cardsData = await fetchCards(workspace_id);
-        if (cardsData.length === 0 && !hasAddedDefaultCards.current) {
-          hasAddedDefaultCards.current = true;
-          const promises = defaultCards.map((card) =>
-            addCard({ name: card.name, order: card.order }, workspace_id)
-          );
-          await Promise.all(promises);
-          setCards(defaultCards);
-        } else {
-          setCards(cardsData);
+          const workspaceUsers = await fetchWorkspaceUsers(workspace_id);
+          SetUsers(workspaceUsers);
+        } catch (error: any) {
+          console.error("Error:", error.message);
         }
+      };
 
-        const workspaceUsers = await fetchWorkspaceUsers(workspace_id);
-        SetUsers(workspaceUsers);
-      } catch (error: any) {
-        console.error("Error:", error.message);
+      if (workspace_id) {
+        fetchData();
       }
-    };
+    }, [workspace_id]);
 
-    if (workspace_id) {
-      fetchData();
-    }
-  }, [workspace_id]);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const tasksData: TaskInterface[] = await fetchTasks(workspace_id);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const tasksData: TaskInterface[] = await fetchTasks(workspace_id);
+          setTasks(tasksData);
+        } catch (error: any) {
+          console.error("Error:", error.message);
+        }
+      };
 
-        setTasks(tasksData);
-      } catch (error: any) {
-        console.error("Error:", error.message);
+      if (cards.length > 0 && workspace_id) {
+        fetchData();
       }
-    };
+    }, [cards, workspace_id]);
 
-    if (cards.length > 0 && workspace_id) {
-      fetchData();
-    }
-  }, [cards, workspace_id]);
+    const sensors = useSensors(
+      useSensor(PointerSensor, {
+        activationConstraint: {
+          distance: 10,
+        },
+      })
+    );
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
-    })
-  );
+    //reorderCards();
 
-  return (
-    <div className="">
-      {tasks.length > 0 && workspace_id && (
-        <Chart workspace_id={workspace_id} tasks={tasks} />
-      )}
-      <DndContext
-        onDragStart={onDragStart}
-        onDragOver={onDragOver}
-        sensors={sensors}
-      >
-        <div>
-          {editMode ? (
-            <div className="text-center items-center mt-6">
-              <input
-                autoFocus
-                className="text-center text-4xl w-full outline-none text-red-500 pb-2"
-                onChange={(e) =>
-                  updateWorkspaceName(workspace.id, e.target.value)
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    toggleEditMode();
+    return (
+      <div className="">
+        {tasks.length > 0 && workspace_id && (
+          <Chart workspace_id={workspace_id} tasks={tasks} />
+        )}
+        <DndContext
+          onDragStart={onDragStart}
+          onDragOver={onDragOver}
+          sensors={sensors}
+        >
+          <div>
+            {editMode ? (
+              <div className="text-center items-center mt-6">
+                <input
+                  autoFocus
+                  className="text-center text-4xl w-full outline-none text-red-500 pb-2"
+                  onChange={(e) =>
+                    updateWorkspaceName(workspace.id, e.target.value)
                   }
-                }}
-                defaultValue={workspace.name}
-              />
-              <div className="w-1/2 m-auto h-[1px] bg-red-500"></div>
-            </div>
-          ) : (
-            <div className="text-center mt-6">
-              <h1
-                onClick={toggleEditMode}
-                className="text-4xl border-b inline-block pb-2 border-black"
-              >
-                {workspace.name}
-              </h1>
-              <div className="text-3xl">
-                <button onClick={() => openModal()}>Add User</button>
-                <SelectUserModal
-                  users={users}
-                  getUsers={getUsers}
-                  isOpen={modalIsOpen}
-                  onAfterOpen={() => {}}
-                  onRequestAddUsers={addUsers}
-                  onRequestClose={closeModal}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      toggleEditMode();
+                    }
+                  }}
+                  defaultValue={workspace.name}
                 />
+                <div className="w-1/2 m-auto h-[1px] bg-red-500"></div>
+              </div>
+            ) : (
+              <div className="text-center mt-6">
+                <h1
+                  onClick={toggleEditMode}
+                  className="text-4xl border-b inline-block pb-2 border-black"
+                >
+                  {workspace.name}
+                </h1>
+
+                {workspace.id == decodedToken.id && (
+                  <div className="text-3xl">
+                    <button onClick={() => openModal()}>Add User</button>
+                    <SelectUserModal
+                      users={users}
+                      getUsers={getUsers}
+                      isOpen={modalIsOpen}
+                      onAfterOpen={() => {}}
+                      onRequestAddUsers={addUsers}
+                      onRequestClose={closeModal}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="m-auto flex gap-4 overflow-y-scroll">
+              <div className="m-auto flex items-center p-4">
+                {cards
+                  .sort((a, b) => a.order - b.order)
+                  .map((card) => (
+                    <Card
+                      key={card.id}
+                      card={card}
+                      createTask={createTask}
+                      tasks={tasks.filter((task) => task.card_id === card.id)}
+                      updateTaskContent={updateTaskContent}
+                      removeTask={removeTask}
+                    />
+                  ))}
               </div>
             </div>
-          )}
-          <div className="m-auto flex gap-4 overflow-y-scroll">
-            <div className="m-auto flex items-center p-4">
-              {cards
-                .sort((a, b) => a.order - b.order)
-                .map((card) => (
-                  <Card
-                    key={card.id}
-                    card={card}
-                    createTask={createTask}
-                    tasks={tasks.filter((task) => task.card_id === card.id)}
-                    updateTaskContent={updateTaskContent}
-                    removeTask={removeTask}
-                  />
-                ))}
-            </div>
           </div>
-        </div>
-        {createPortal(
-          <DragOverlay>
-            {activeTask && (
-              <Task
-                task={activeTask}
-                updateTaskContent={updateTaskContent}
-                removeTask={removeTask}
-              />
-            )}
-          </DragOverlay>,
-          document.body
-        )}
-      </DndContext>
-    </div>
-  );
+          {createPortal(
+            <DragOverlay>
+              {activeTask && (
+                <Task
+                  task={activeTask}
+                  updateTaskContent={updateTaskContent}
+                  removeTask={removeTask}
+                />
+              )}
+            </DragOverlay>,
+            document.body
+          )}
+        </DndContext>
+      </div>
+    );
+  }
+  // function createNewCard(id: Id, name: string = "New Card", order: number) {
+  //   const cardToAdd: CardInterface = {
+  //     id: id,
+  //     name: name,
+  //     order: order,
+  //   };
+
+  //   setCards([...cards, cardToAdd]);
+  // }
 
   function createTask(newTask: TaskCreationInterface, card_id: number) {
     addTask(newTask, card_id).then((task) => {

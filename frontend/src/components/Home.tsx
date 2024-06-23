@@ -66,16 +66,6 @@ function Home() {
           ))}
         </div>
 
-        {workspaceToDelete && (
-          // Use optional chaining (?.) to safely access properties
-          <DeleteWorkspaceModal
-            workspace={workspaces.find((w) => w.id === workspaceToDelete)}
-            isOpen={true}
-            onRequestDelete={removeWorkspace}
-            onRequestClose={closeModal}
-          />
-        )}
-
         <div className="fixed bottom-0 right-0 m-8">
           <button
             className="px-8 py-6 bg-gray-800 text-center flex text-white rounded-2xl hover:bg-gray-900"
