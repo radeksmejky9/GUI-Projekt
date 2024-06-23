@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import BIGINT, Column
+from sqlalchemy.orm import relationship
 
 
 class User(SQLModel, table=True):
@@ -23,8 +24,16 @@ class Workspace(SQLModel, table=True):
     name: str
     owner_id: int = Field(foreign_key="users.id")
 
-    workspace_users: List["WorkspaceUser"] = Relationship(back_populates="workspace")
-    cards: List["Card"] = Relationship(back_populates="workspace")
+    workspace_users: List["WorkspaceUser"] = Relationship(
+        sa_relationship=relationship(
+            "WorkspaceUser", cascade="all, delete", back_populates="workspace"
+        )
+    )
+    cards: List["Card"] = Relationship(
+        sa_relationship=relationship(
+            "Card", cascade="all, delete", back_populates="workspace"
+        )
+    )
 
 
 class WorkspaceUser(SQLModel, table=True):
@@ -45,7 +54,11 @@ class Card(SQLModel, table=True):
     order: Optional[int] = None
 
     workspace: "Workspace" = Relationship(back_populates="cards")
-    tasks: List["Task"] = Relationship(back_populates="card")
+    tasks: List["Task"] = Relationship(
+        sa_relationship=relationship(
+            "Task", cascade="all, delete", back_populates="card"
+        )
+    )
 
 
 class Task(SQLModel, table=True):

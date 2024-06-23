@@ -31,7 +31,9 @@ async def create_workspace(
 @router.get("/token/{token}/workspaces", response_model=List[Workspace])
 async def get_workspaces(token: str, session: Session = Depends(get_session)):
     user_id = Token.decode_access_token(token)["user_id"]
-    workspaces = session.exec(select(Workspace).where(Workspace.owner_id == user_id)).all()
+    workspaces = session.exec(
+        select(Workspace).where(Workspace.owner_id == user_id)
+    ).all()
     return workspaces
 
 
@@ -164,6 +166,7 @@ async def get_tasks_in_workspace(
     ).all()
     return tasks
 
+
 @router.delete("/tasks/{task_id}")
 async def delete_task(task_id: int, session: Session = Depends(get_session)):
     task = session.get(Task, task_id)
@@ -177,8 +180,12 @@ async def delete_task(task_id: int, session: Session = Depends(get_session)):
 @router.delete("/workspaces/{workspace_id}")
 async def delete_workspace(workspace_id: int, session: Session = Depends(get_session)):
     workspace = session.get(Workspace, workspace_id)
+
     if workspace:
         session.delete(workspace)
         commit_and_handle_exception(session)
-        return {"detail": "Workspace deleted successfully"}
-    return HTTPException(status_code=404, detail="Workspace not found")
+        return {
+            "detail": "Workspace and its related cards and tasks deleted successfully"
+        }
+
+    raise HTTPException(status_code=404, detail="Workspace not found")
