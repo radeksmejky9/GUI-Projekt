@@ -31,9 +31,10 @@ async def create_task(task: TaskModel, session: Session = Depends(get_session)):
         description=task.description,
         start_date=task.start_date,
         completion_date=task.completion_date,
+        deadline=task.deadline,
+        card_name=task.card_name,
         workspace_id=task.workspace_id,
         order=task.order,
-        card_name=task.card_name,
     )
     session.add(task)
     commit_and_handle_exception(session)
@@ -57,6 +58,8 @@ async def update_task(
         task.completion_date = ""
     else:
         task.completion_date = task_update.completion_date
+    if task_update.deadline is not None:
+        task.deadline = task_update.deadline
     if task_update.card_name is not None:
         task.card_name = task_update.card_name
     if task_update.order is not None:

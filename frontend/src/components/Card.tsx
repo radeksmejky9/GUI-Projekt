@@ -71,6 +71,9 @@ function Card({
               card.name == "Done"
                 ? new Date().toISOString()
                 : new Date(0).toISOString(),
+            deadline: new Date(
+              new Date().getTime() + 7 * 24 * 60 * 60 * 1000
+            ).toISOString(),
             card_name: card.name,
             order: tasks.length + 1,
             workspace_id: workspace_id,
