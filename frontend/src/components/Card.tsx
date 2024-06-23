@@ -26,14 +26,7 @@ function Card({
     return tasks.map((task) => task.id);
   }, [tasks]);
 
-  const {
-    setNodeRef,
-    /*attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,*/
-  } = useSortable({
+  const { setNodeRef } = useSortable({
     id: card.id,
     data: {
       type: "Card",
@@ -41,32 +34,16 @@ function Card({
     },
   });
 
-  /*const style = {
-    transition,
-    transform: CSS.Transform.toString(transform),
-  };
-
-  if (isDragging) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="bg-lime-400 opacity-40 border-2 border-pink-500 w-[350px] h-[500px] max-h-[500px] rounded-md flex flex-col"
-      ></div>
-    );
-  }*/
   reorder();
   return (
     <div
       ref={setNodeRef}
       className="bg-gray-200 w-[350px] h-[500px] max-h-[500px] rounded-md flex flex-col m-1"
     >
-      {/* Header */}
       <div className="bg-gray-400 text-xl rounded-t-md p-2 font-bold border-b-4 border-gray-200 flex justify-between items-center">
         <h1>{card.name}</h1>
       </div>
 
-      {/* Body */}
       <div className="flex flex-grow flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
         <SortableContext items={tasksIds}>
           {tasks
@@ -82,7 +59,6 @@ function Card({
         </SortableContext>
       </div>
 
-      {/* Footer */}
       <div
         onClick={() => {
           const newTask = {

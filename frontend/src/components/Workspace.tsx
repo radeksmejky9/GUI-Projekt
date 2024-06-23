@@ -153,7 +153,8 @@ function Workspace() {
     return (
       <div className="">
         {tasks.length > 0 && workspace_id && (
-          <Chart workspace_id={workspace_id} tasks={tasks} />
+          /*<Chart workspace_id={workspace_id} tasks={tasks} />*/
+          <></>
         )}
         <DndContext
           onDragStart={onDragStart}
@@ -243,15 +244,6 @@ function Workspace() {
       </div>
     );
   }
-  // function createNewCard(id: Id, name: string = "New Card", order: number) {
-  //   const cardToAdd: CardInterface = {
-  //     id: id,
-  //     name: name,
-  //     order: order,
-  //   };
-
-  //   setCards([...cards, cardToAdd]);
-  // }
 
   function createTask(newTask: TaskCreationInterface, card_id: number) {
     addTask(newTask, card_id).then((task) => {
@@ -295,12 +287,10 @@ function Workspace() {
     }
 
     const isOverACard = over.data.current?.type === "Card";
-    // Im dropping a Task over a card
     if (isActiveATask && isOverACard) {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((task) => task.id === activeId);
         tasks[activeIndex].card_id = overId;
-        console.log({ ...tasks[activeIndex] });
         if (tasks[activeIndex].card_id === cards[cards.length - 1].id) {
           tasks[activeIndex].completion_date = new Date().toISOString();
         } else {
@@ -312,7 +302,6 @@ function Workspace() {
     }
   }
   function updateTaskContent(id: number, field: string, value: string) {
-    // Find the task to update
     const index = tasks.findIndex((task) => task.id === id);
 
     if (index === -1) {
