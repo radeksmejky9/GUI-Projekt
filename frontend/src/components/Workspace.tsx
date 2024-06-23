@@ -59,8 +59,8 @@ const defaultCards: CardInterface[] = [
 ];
 const defaultWorkspace: WorkspaceInterface = {
   id: -1,
-  name: "",
   owner_id: -1,
+  name: "Please login to use this feature!",
 };
 
 function Workspace() {
