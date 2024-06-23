@@ -25,10 +25,10 @@ export type TaskInterface = {
 export type TaskCreationInterface = {
   name: string;
   description: string;
-  start_date: string;
   completion_date: string;
-  card_name: string;
+  start_date: string;
   order: number;
+  card_name: string;
 };
 
 export type WorkspaceInterface = {

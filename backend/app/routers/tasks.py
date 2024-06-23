@@ -29,7 +29,6 @@ async def create_task(task: TaskModel, session: Session = Depends(get_session)):
     task = Task(
         name=task.name,
         description=task.description,
-        deadline=task.deadline,
         start_date=task.start_date,
         completion_date=task.completion_date,
         workspace_id=task.workspace_id,

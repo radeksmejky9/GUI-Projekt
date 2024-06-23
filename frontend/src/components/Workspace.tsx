@@ -162,7 +162,7 @@ function Workspace() {
                   {workspace.name}
                 </h1>
 
-                {workspace.id === decodedToken.id && (
+                {workspace.owner_id === decodedToken.id && (
                   <div className="text-3xl">
                     <button onClick={() => openModal()}>Add User</button>
                     <SelectUserModal

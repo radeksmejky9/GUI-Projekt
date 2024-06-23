@@ -78,7 +78,7 @@ function Card({
 
           createTask(newTask);
         }}
-        className="flex items-center justify-center bg-gray-400 hover:bg-lime-500 rounded-b-md p-2 cursor-pointer"
+        className="flex items-center justify-center bg-gray-400 hover:bg-gray-500 rounded-b-md p-2 cursor-pointer"
       >
         Add Task
       </div>

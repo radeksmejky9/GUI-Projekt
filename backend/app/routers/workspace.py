@@ -62,6 +62,7 @@ async def delete_workspace(workspace_id: int, session: Session = Depends(get_ses
     raise HTTPException(status_code=404, detail="Workspace not found")
 
 
+@router.post("/workspaces", response_model=Workspace)
 async def create_workspace(
     workspace: WorkspaceModel, token: str, session: Session = Depends(get_session)
 ):

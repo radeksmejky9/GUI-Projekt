@@ -21,5 +21,6 @@ class TaskUpdateModel(BaseModel):
     name: Union[str, None]
     description: Union[str, None]
     completion_date: Union[datetime, None]
+    start_date: Union[str, None]
     order: Union[int, None]
-    card_name: Union[int, None]
+    card_name: Union[str, None]

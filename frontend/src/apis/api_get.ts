@@ -48,8 +48,8 @@ export async function fetchWorkspaces() {
 
   try {
     const [ownedWorkspaces, memberWorkspaces] = await Promise.all([
-      fetchData(`/ownedworkspaces?token=${token}`),
-      fetchData(`/memberworkspaces?token=${token}`),
+      fetchData(`/owned_workspaces?token=${token}`),
+      fetchData(`/member_workspaces?token=${token}`),
     ]);
     return [...ownedWorkspaces, ...memberWorkspaces] as WorkspaceInterface[];
   } catch (error: any) {
