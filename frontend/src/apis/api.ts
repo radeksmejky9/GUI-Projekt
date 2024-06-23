@@ -63,24 +63,28 @@ export async function fetchTasks(workspace_id: number) {
 }
 
 export async function fetchWorkspaces() {
-  if (localStorage.getItem("token") === null) {
+  const token = localStorage.getItem("token");
+  if (!token) {
     throw new Error("You have to be logged in.");
   }
-  try {
-    const response = await fetch(
-      `http://${
-        process.env.REACT_APP_CONNECTION_IP
-      }:8000/token/${localStorage.getItem("token")}/workspaces`
-    );
-    if (!response.ok) {
-      throw new Error("Failed to fetch workspaces");
-    }
-    const workspaces: WorkspaceInterface[] = await response.json();
-    return workspaces;
-  } catch (error: any) {
-    console.error("Error fetching tasks:", error.message);
-    throw error;
-  }
+
+  const ownedWorkspacesUrl = `http://${process.env.REACT_APP_CONNECTION_IP}:8000/ownedworkspaces?token=${token}`;
+  const memberWorkspacesUrl = `http://${process.env.REACT_APP_CONNECTION_IP}:8000/memberworkspaces?token=${token}`;
+
+  const [ownedWorkspaces, memberWorkspaces] = await Promise.all([
+    fetch(ownedWorkspacesUrl)
+      .then((response) => response.json())
+      .catch((error) => {
+        throw new Error(`Failed to fetch owned workspaces: ${error.message}`);
+      }),
+    fetch(memberWorkspacesUrl)
+      .then((response) => response.json())
+      .catch((error) => {
+        throw new Error(`Failed to fetch member workspaces: ${error.message}`);
+      }),
+  ]);
+
+  return [...ownedWorkspaces, ...memberWorkspaces];
 }
 
 export async function fetchWorkspace(workspace_id: number) {

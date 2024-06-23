@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import union_all
 from sqlmodel import Session, select
 from db.schemas import Card, Task, User, Workspace, WorkspaceUser
 from typing import Annotated, List
@@ -27,13 +28,22 @@ async def get_workspaceUsers(workspace_id: int, session: db_dependency):
     return users
 
 
-@router.get("/token/{token}/workspaces", response_model=List[Workspace])
-async def get_workspaces(token: str, session: Session = Depends(get_session)):
+@router.get("/ownedworkspaces", response_model=List[Workspace])
+async def get_owned_workspaces(token: str, session: Session = Depends(get_session)):
     user_id = Token.decode_access_token(token)["user_id"]
-    workspaces = session.exec(
-        select(Workspace).where(Workspace.owner_id == user_id)
+    result = session.exec(select(Workspace).where(Workspace.owner_id == user_id)).all()
+    return result
+
+
+@router.get("/memberworkspaces", response_model=List[Workspace])
+async def get_member_workspaces(token: str, session: Session = Depends(get_session)):
+    user_id = Token.decode_access_token(token)["user_id"]
+    result = session.exec(
+        select(Workspace)
+        .join(WorkspaceUser, Workspace.id == WorkspaceUser.workspace_id)
+        .where(WorkspaceUser.user_id == user_id)
     ).all()
-    return workspaces
+    return result
 
 
 @router.get("/workspaces/{workspace_id}", response_model=Workspace)
@@ -218,7 +228,9 @@ async def delete_workspace(workspace_id: int, session: Session = Depends(get_ses
 
 
 @router.delete("/workspaces/{workspace_id}/users")
-async def delete_workspaceUser( workspace_id: int, session: Session = Depends(get_session)):
+async def delete_workspaceUser(
+    workspace_id: int, session: Session = Depends(get_session)
+):
     workspace = session.get(Workspace, workspace_id)
 
     if workspace:
@@ -226,7 +238,8 @@ async def delete_workspaceUser( workspace_id: int, session: Session = Depends(ge
             select(WorkspaceUser).where(WorkspaceUser.workspace_id == workspace_id)
         ).all()
         if workspace_users:
-            session.delete(workspace_users)
+            for workspace_user in workspace_users:
+                session.delete(workspace_user)
         session.commit()
         return {"detail": "Users deleted from workspace successfully"}
 
