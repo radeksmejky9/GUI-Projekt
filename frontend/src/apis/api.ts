@@ -75,7 +75,8 @@ export async function fetchWorkspaces() {
     if (!response.ok) {
       throw new Error("Failed to fetch workspaces");
     }
-    return await response.json();
+    const workspaces: WorkspaceInterface[] = await response.json();
+    return workspaces;
   } catch (error: any) {
     console.error("Error fetching tasks:", error.message);
     throw error;
@@ -155,6 +156,36 @@ export async function addWorkspace(
     return await response.json();
   } catch (error: any) {
     console.error("Error adding workspace:", error.message);
+    throw error;
+  }
+}
+
+export async function addUsersToWorkspace(
+  workspace_id: number,
+  users: UserInterface[]
+) {
+  if (localStorage.getItem("token") === null)
+    throw new Error("You have to be logged in.");
+
+  try {
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/users`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(users),
+      }
+    );
+    console.log(response);
+    if (!response.ok) {
+      throw new Error("Failed to add users");
+    }
+
+    return await response.json();
+  } catch (error: any) {
+    console.error("Error adding users:", error.message);
     throw error;
   }
 }
@@ -284,6 +315,32 @@ export async function deleteTask(task_id: number) {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(`Failed to delete task: ${errorData.detail}`);
+    }
+
+    const data = await response.json();
+    console.log(data.detail);
+  } catch (error: any) {
+    console.error(error.message);
+  }
+}
+
+export async function deleteUsersFromWorkspace(workspace_id: number) {
+  try {
+    if (localStorage.getItem("token") === null)
+      throw new Error("You have to be logged in.");
+
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/users`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to delete users: ${errorData.detail}`);
     }
 
     const data = await response.json();

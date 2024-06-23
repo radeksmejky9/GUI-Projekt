@@ -218,20 +218,15 @@ async def delete_workspace(workspace_id: int, session: Session = Depends(get_ses
 
 
 @router.delete("/workspaces/{workspace_id}/users")
-async def delete_workspaceUser(
-    workspace_id: int, Users: List[User], session: Session = Depends(get_session)
-):
+async def delete_workspaceUser( workspace_id: int, session: Session = Depends(get_session)):
     workspace = session.get(Workspace, workspace_id)
+
     if workspace:
-        for user in Users:
-            workspace_user = session.exec(
-                select(WorkspaceUser).where(
-                    WorkspaceUser.workspace_id == workspace_id
-                    and WorkspaceUser.user_id == user.id
-                )
-            ).first()
-            if workspace_user:
-                session.delete(workspace_user)
+        workspace_users = session.exec(
+            select(WorkspaceUser).where(WorkspaceUser.workspace_id == workspace_id)
+        ).all()
+        if workspace_users:
+            session.delete(workspace_users)
         session.commit()
         return {"detail": "Users deleted from workspace successfully"}
 

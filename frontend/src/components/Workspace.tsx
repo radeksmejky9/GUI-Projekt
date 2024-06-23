@@ -20,7 +20,9 @@ import { useParams } from "react-router-dom";
 import {
   addCard,
   addTask,
+  addUsersToWorkspace,
   deleteTask,
+  deleteUsersFromWorkspace,
   fetchCards,
   fetchTasks,
   fetchUsers,
@@ -186,7 +188,7 @@ function Workspace() {
                   getUsers={getUsers}
                   isOpen={modalIsOpen}
                   onAfterOpen={() => {}}
-                  onRequestAddUsers={addUsersToWorkspace}
+                  onRequestAddUsers={addUsers}
                   onRequestClose={closeModal}
                 />
               </div>
@@ -360,7 +362,10 @@ function Workspace() {
     return editedUsers;
   }
 
-  function addUsersToWorkspace(users: UserInterface[]) {}
+  function addUsers(users: UserInterface[]) {
+    deleteUsersFromWorkspace(workspace.id);
+    addUsersToWorkspace(workspace.id, users);
+  }
 }
 
 export default Workspace;

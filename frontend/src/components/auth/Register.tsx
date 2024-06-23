@@ -159,7 +159,6 @@ const Register: React.FC = () => {
                 name="profile_picture_url"
                 type="text"
                 autoComplete="url"
-                required
                 className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-gray-500 focus:border-gray-500 focus:z-10 sm:text-sm"
                 placeholder="Profile Picture URL"
                 value={newUser.profile_picture_url}

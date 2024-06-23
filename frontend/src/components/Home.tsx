@@ -1,3 +1,5 @@
+import { jwtDecode } from "jwt-decode";
+import { JwtPayload } from "jsonwebtoken";
 import { addWorkspace, deleteWorkspace, fetchWorkspaces } from "../apis/api";
 import TrashIcon from "../icons/TrashIcon";
 import { WorkspaceInterface } from "../types/types";
@@ -5,6 +7,7 @@ import { useState, useEffect } from "react";
 
 function Home() {
   const [workspaces, setWorkspaces] = useState<WorkspaceInterface[]>([]);
+
   useEffect(() => {
     fetchWorkspaces()
       .then((data) => setWorkspaces(data))
@@ -12,7 +15,11 @@ function Home() {
         console.error("Error fetching cards:", error.message)
       );
   }, []);
-  if (localStorage.getItem("token") != null)
+
+  const token = localStorage.getItem("token");
+
+  if (token != null) {
+    const decodedToken = jwtDecode<JwtPayload>(token);
     return (
       <div className="p-4">
         <h1 className="text-3xl font-bold mb-6">My Workspaces</h1>
@@ -26,22 +33,24 @@ function Home() {
                 <h2 className="text-xl font-semibold break-all overflow-y-auto max-h-[100px]">
                   {workspace.name}
                 </h2>
-                <button
-                  className="p-3 stroke-black"
-                  onClick={() => {
-                    const confirmDelete = window.confirm(
-                      "Are you sure you want to delete this workspace?"
-                    );
-                    if (confirmDelete) {
-                      deleteWorkspace(workspace.id);
-                      setWorkspaces(
-                        workspaces.filter((w) => w.id !== workspace.id)
+                {decodedToken.id === workspace.owner_id && (
+                  <button
+                    className="p-3 stroke-black"
+                    onClick={() => {
+                      const confirmDelete = window.confirm(
+                        "Are you sure you want to delete this workspace?"
                       );
-                    }
-                  }}
-                >
-                  <TrashIcon />
-                </button>
+                      if (confirmDelete) {
+                        deleteWorkspace(workspace.id);
+                        setWorkspaces(
+                          workspaces.filter((w) => w.id !== workspace.id)
+                        );
+                      }
+                    }}
+                  >
+                    <TrashIcon />
+                  </button>
+                )}
               </div>
               <a
                 href={`/workspace/${workspace.id}`}
@@ -69,9 +78,9 @@ function Home() {
         </div>
       </div>
     );
-  else
+  } else
     return (
-      <div className="p-4 text-red-500 font-bold">
+      <div className="p-4 text-red-500 font-bold text-center">
         Please login to use this feature!
       </div>
     );
