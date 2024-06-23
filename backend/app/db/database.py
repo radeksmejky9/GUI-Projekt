@@ -23,7 +23,7 @@ def commit_and_handle_exception(session: Session):
     try:
         session.commit()
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Database error")
+        raise HTTPException(status_code=500, detail="Database error + " + str(e))
 
 
 def refresh_and_handle_exception(session: Session, *objects):

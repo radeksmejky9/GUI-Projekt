@@ -19,6 +19,7 @@ import { useParams } from "react-router-dom";
 import {
   addCard,
   addTask,
+  deleteTask,
   fetchCards,
   fetchTasks,
   fetchWorkspace,
@@ -28,6 +29,7 @@ import {
 import { createPortal } from "react-dom";
 import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
+import TrashIcon from "../icons/TrashIcon";
 
 const defaultCards: CardInterface[] = [
   {
@@ -161,6 +163,7 @@ function Workspace() {
                     createTask={createTask}
                     tasks={tasks.filter((task) => task.card_id === card.id)}
                     updateTaskContent={updateTaskContent}
+                    removeTask={removeTask}
                   />
                 ))}
             </div>
@@ -169,7 +172,11 @@ function Workspace() {
         {createPortal(
           <DragOverlay>
             {activeTask && (
-              <Task task={activeTask} updateTaskContent={updateTaskContent} />
+              <Task
+                task={activeTask}
+                updateTaskContent={updateTaskContent}
+                removeTask={removeTask}
+              />
             )}
           </DragOverlay>,
           document.body
@@ -201,6 +208,7 @@ function Workspace() {
                   createTask={createTask}
                   tasks={tasks.filter((task) => task.card_id === card.id)}
                   updateTaskContent={updateTaskContent}
+                  removeTask={removeTask}
                 />
               ))}
           </div>
@@ -209,7 +217,11 @@ function Workspace() {
       {createPortal(
         <DragOverlay>
           {activeTask && (
-            <Task task={activeTask} updateTaskContent={updateTaskContent} />
+            <Task
+              task={activeTask}
+              updateTaskContent={updateTaskContent}
+              removeTask={removeTask}
+            />
           )}
         </DragOverlay>,
         document.body
@@ -337,6 +349,11 @@ function Workspace() {
     workspace.name = value.trim();
     updateWorkspace(workspace, id);
     setWorkspace(workspace);
+  }
+
+  function removeTask(task: TaskInterface) {
+    deleteTask(task.id);
+    setTasks(tasks.filter((t) => t.id !== task.id));
   }
 }
 

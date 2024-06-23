@@ -110,7 +110,6 @@ export async function addWorkspace(
         body: JSON.stringify(workspace),
       }
     );
-    console.log(response);
     if (!response.ok) {
       throw new Error("Failed to add workspace");
     }
@@ -191,5 +190,52 @@ export async function updateWorkspace(
   } catch (error: any) {
     console.error("Error updating task:", error.message);
     throw error;
+  }
+}
+
+export async function deleteWorkspace(workspace_id: number) {
+  try {
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(response);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to delete workspace: ${errorData.detail}`);
+    }
+
+    const data = await response.json();
+    console.log(data.detail);
+  } catch (error: any) {
+    console.error(error.message);
+  }
+}
+
+export async function deleteTask(task_id: number) {
+  try {
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/tasks/${task_id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to delete task: ${errorData.detail}`);
+    }
+
+    const data = await response.json();
+    console.log(data.detail);
+  } catch (error: any) {
+    console.error(error.message);
   }
 }

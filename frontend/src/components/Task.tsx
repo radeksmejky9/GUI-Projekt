@@ -2,13 +2,15 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskInterface } from "../types/types";
 import { useState } from "react";
+import TrashIcon from "../icons/TrashIcon";
 
 type Props = {
   task: TaskInterface;
   updateTaskContent: (id: number, field: string, value: string) => void;
+  removeTask(task: TaskInterface): void;
 };
 
-function Task({ task, updateTaskContent }: Props) {
+function Task({ task, updateTaskContent, removeTask }: Props) {
   const [mouseIsOver, setMouseIsOver] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
@@ -111,6 +113,9 @@ function Task({ task, updateTaskContent }: Props) {
       <div>
         <span>{task.description}</span>
       </div>
+      <button className="p-3 stroke-black" onClick={() => removeTask(task)}>
+        <TrashIcon />
+      </button>
     </div>
   );
 }
