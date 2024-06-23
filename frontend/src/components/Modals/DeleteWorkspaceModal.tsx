@@ -15,7 +15,29 @@ function DeleteWorkspaceModal({
   onRequestDelete,
 }: Props) {
   if (!workspace) {
-    return onRequestClose();
+    return (
+      <Modal
+        ariaHideApp={false}
+        isOpen={isOpen}
+        onRequestClose={onRequestClose}
+        contentLabel="Delete Workspace Modal"
+        className="fixed inset-0 flex items-center justify-center bg-transparent"
+      >
+        <div className="p-6 bg-white rounded-lg shadow-lg w-96">
+          <div className="overflow-y-auto max-h-[200px]">
+            No workspace found.
+          </div>
+          <div className="flex justify-between mt-4">
+            <button
+              className="bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded-lg"
+              onClick={onRequestClose}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </Modal>
+    );
   } else {
     return (
       <Modal

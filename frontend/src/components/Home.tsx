@@ -4,7 +4,7 @@ import { addWorkspace, deleteWorkspace, fetchWorkspaces } from "../apis/api";
 import TrashIcon from "./icons/TrashIcon";
 import { WorkspaceInterface } from "../types/types";
 import { useState, useEffect } from "react";
-import DeleteWorkspaceModal from "./Modals/DeleteWorkspaceModal";
+import DeleteWorkspaceModal from "./modals/DeleteWorkspaceModal";
 
 function Home() {
   const [workspaces, setWorkspaces] = useState<WorkspaceInterface[]>([]);
@@ -65,6 +65,15 @@ function Home() {
             </div>
           ))}
         </div>
+
+        {workspaceToDelete && (
+          <DeleteWorkspaceModal
+            workspace={workspaces.find((w) => w.id === workspaceToDelete)}
+            isOpen={true}
+            onRequestDelete={removeWorkspace}
+            onRequestClose={closeModal}
+          />
+        )}
 
         <div className="fixed bottom-0 right-0 m-8">
           <button
