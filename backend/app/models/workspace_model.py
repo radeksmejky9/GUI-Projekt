@@ -7,25 +7,19 @@ class WorkspaceModel(BaseModel):
     name: Union[str, None]
 
 
-class CardModel(BaseModel):
-    name: Union[str, None]
-    order: Union[int, None]
-
-
 class TaskModel(BaseModel):
     name: Union[str, None]
     description: Union[str, None]
-    deadline: Union[datetime, None]
     start_date: Union[datetime, None]
     completion_date: Union[datetime, None]
+    card_name: Union[str, None]
     order: Union[int, None]
+    workspace_id: Union[int, None]
 
 
 class TaskUpdateModel(BaseModel):
     name: Union[str, None]
     description: Union[str, None]
-    deadline: Union[datetime, None]
-    start_date: Union[datetime, None]
     completion_date: Union[datetime, None]
     order: Union[int, None]
-    card_id: int
+    card_name: Union[int, None]

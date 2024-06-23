@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import union_all
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
-from db.schemas import Card, Task, User, Workspace, WorkspaceUser
+from db.schemas import Task, User, Workspace, WorkspaceUser
 from typing import Annotated, List
 from models.token import Token
 from db.database import (
@@ -10,40 +9,11 @@ from db.database import (
     get_session,
 )
 from models.workspace_model import (
-    TaskUpdateModel,
     WorkspaceModel,
-    CardModel,
-    TaskModel,
 )
 
 router = APIRouter(tags=["workspaces"])
 db_dependency = Annotated[Session, Depends(get_session)]
-
-
-@router.get("/workspaces/{workspace_id}/users", response_model=List[WorkspaceUser])
-async def get_workspaceUsers(workspace_id: int, session: db_dependency):
-    users = session.exec(
-        select(WorkspaceUser).where(WorkspaceUser.workspace_id == workspace_id)
-    ).all()
-    return users
-
-
-@router.get("/ownedworkspaces", response_model=List[Workspace])
-async def get_owned_workspaces(token: str, session: Session = Depends(get_session)):
-    user_id = Token.decode_access_token(token)["user_id"]
-    result = session.exec(select(Workspace).where(Workspace.owner_id == user_id)).all()
-    return result
-
-
-@router.get("/memberworkspaces", response_model=List[Workspace])
-async def get_member_workspaces(token: str, session: Session = Depends(get_session)):
-    user_id = Token.decode_access_token(token)["user_id"]
-    result = session.exec(
-        select(Workspace)
-        .join(WorkspaceUser, Workspace.id == WorkspaceUser.workspace_id)
-        .where(WorkspaceUser.user_id == user_id)
-    ).all()
-    return result
 
 
 @router.get("/workspaces/{workspace_id}", response_model=Workspace)
@@ -52,89 +22,12 @@ async def get_workspace(workspace_id: int, session: Session = Depends(get_sessio
     return workspace
 
 
-@router.get("/workspaces/{workspace_id}/cards", response_model=List[Card])
-async def get_cards_in_workspace(
-    workspace_id: int, session: Session = Depends(get_session)
-):
-    cards = session.exec(select(Card).where(Card.workspace_id == workspace_id)).all()
-    return cards
-
-
-@router.get("/cards/{card_id}/tasks", response_model=List[Task])
-async def get_tasks_in_card(card_id: int, session: Session = Depends(get_session)):
-    tasks = session.exec(select(Task).where(Task.card_id == card_id)).all()
-    return tasks
-
-
 @router.get("/workspaces/{workspace_id}/tasks", response_model=List[Task])
 async def get_tasks_in_workspace(
     workspace_id: int, session: Session = Depends(get_session)
 ):
-    tasks = session.exec(
-        select(Task).join(Card).where(Card.workspace_id == workspace_id)
-    ).all()
+    tasks = session.exec(select(Task).where(Task.workspace_id == workspace_id)).all()
     return tasks
-
-
-@router.post("/workspaces/{workspace_id}/users", response_model=List[User])
-async def create_workspaceUsers(
-    workspace_id: int,
-    Users: List[User],
-    session: Session = Depends(get_session),
-):
-    for user in Users:
-        workspaceUser = WorkspaceUser(workspace_id=workspace_id, user_id=user.id)
-        session.add(workspaceUser)
-    commit_and_handle_exception(session)
-    return Users
-
-
-@router.post("/workspaces/{token}", response_model=Workspace)
-async def create_workspace(
-    workspace: WorkspaceModel, token: str, session: Session = Depends(get_session)
-):
-    workspace = Workspace(
-        name=workspace.name,
-        owner_id=Token.decode_access_token(token)["user_id"],
-    )
-    session.add(workspace)
-    commit_and_handle_exception(session)
-    refresh_and_handle_exception(session, workspace)
-    return workspace
-
-
-@router.post("/workspaces/{workspace_id}/cards", response_model=Card)
-async def create_card(
-    card: CardModel, workspace_id: int, session: Session = Depends(get_session)
-):
-    card = Card(
-        name=card.name,
-        workspace_id=workspace_id,
-        order=card.order,
-    )
-    session.add(card)
-    commit_and_handle_exception(session)
-    refresh_and_handle_exception(session, card)
-    return card
-
-
-@router.post("/cards/{card_id}/tasks", response_model=Task)
-async def create_task(
-    card_id: int, task: TaskModel, session: Session = Depends(get_session)
-):
-    task = Task(
-        name=task.name,
-        description=task.description,
-        deadline=task.deadline,
-        start_date=task.start_date,
-        completion_date=task.completion_date,
-        order=task.order,
-        card_id=card_id,
-    )
-    session.add(task)
-    commit_and_handle_exception(session)
-    refresh_and_handle_exception(session, task)
-    return task
 
 
 @router.put("/workspaces/{workspace_id}", response_model=Workspace)
@@ -155,64 +48,6 @@ async def update_workspace(
     return workspace
 
 
-@router.put("/cards/{card_id}", response_model=Card)
-async def update_card(
-    card_id: int, card_update: CardModel, session: Session = Depends(get_session)
-):
-    card = session.get(Card, card_id)
-    if not card:
-        raise HTTPException(status_code=404, detail="Card not found")
-
-    if card_update.name is not None:
-        card.name = card_update.name
-    if card_update.order is not None:
-        card.order = card_update.order
-
-    commit_and_handle_exception(session)
-    refresh_and_handle_exception(session, card)
-    return card
-
-
-@router.put("/tasks/{task_id}", response_model=Task)
-async def update_task(
-    task_id: int, task_update: TaskUpdateModel, session: Session = Depends(get_session)
-):
-    task = session.get(Task, task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-
-    if task_update.name is not None:
-        task.name = task_update.name
-    if task_update.description is not None:
-        task.description = task_update.description
-    if task_update.deadline is not None:
-        task.deadline = task_update.deadline
-    if task_update.start_date is not None:
-        task.start_date = task_update.start_date
-    if task_update.completion_date is None:
-        task.completion_date = ""
-    else:
-        task.completion_date = task_update.completion_date
-    if task_update.order is not None:
-        task.order = task_update.order
-    if task_update.card_id is not None:
-        task.card_id = task_update.card_id
-
-    commit_and_handle_exception(session)
-    refresh_and_handle_exception(session, task)
-    return task
-
-
-@router.delete("/tasks/{task_id}")
-async def delete_task(task_id: int, session: Session = Depends(get_session)):
-    task = session.get(Task, task_id)
-    if task:
-        session.delete(task)
-        commit_and_handle_exception(session)
-        return {"detail": "Task deleted successfully"}
-    return {"detail": "Task not found"}
-
-
 @router.delete("/workspaces/{workspace_id}")
 async def delete_workspace(workspace_id: int, session: Session = Depends(get_session)):
     workspace = session.get(Workspace, workspace_id)
@@ -227,20 +62,14 @@ async def delete_workspace(workspace_id: int, session: Session = Depends(get_ses
     raise HTTPException(status_code=404, detail="Workspace not found")
 
 
-@router.delete("/workspaces/{workspace_id}/users")
-async def delete_workspaceUser(
-    workspace_id: int, session: Session = Depends(get_session)
+async def create_workspace(
+    workspace: WorkspaceModel, token: str, session: Session = Depends(get_session)
 ):
-    workspace = session.get(Workspace, workspace_id)
-
-    if workspace:
-        workspace_users = session.exec(
-            select(WorkspaceUser).where(WorkspaceUser.workspace_id == workspace_id)
-        ).all()
-        if workspace_users:
-            for workspace_user in workspace_users:
-                session.delete(workspace_user)
-        session.commit()
-        return {"detail": "Users deleted from workspace successfully"}
-
-    raise HTTPException(status_code=404, detail="Workspace not found")
+    workspace = Workspace(
+        name=workspace.name,
+        owner_id=Token.decode_access_token(token)["user_id"],
+    )
+    session.add(workspace)
+    commit_and_handle_exception(session)
+    refresh_and_handle_exception(session, workspace)
+    return workspace

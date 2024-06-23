@@ -1,13 +1,11 @@
 from datetime import timedelta
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from db.database import (
-    commit_and_handle_exception,
     get_session,
-    refresh_and_handle_exception,
 )
 from db.schemas import User
 from models.user_model import UserModel
