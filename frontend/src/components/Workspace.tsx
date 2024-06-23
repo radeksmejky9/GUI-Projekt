@@ -30,6 +30,7 @@ import { createPortal } from "react-dom";
 import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
 import TrashIcon from "../icons/TrashIcon";
+import Chart from "./Chart";
 
 const defaultCards: CardInterface[] = [
   {
@@ -128,30 +129,41 @@ function Workspace() {
   );
   //reorderCards();
 
-  if (editMode) {
-    return (
+  return (
+    <div>
+      {tasks.length > 0 && workspace_id && (
+        <Chart workspace_id={workspace_id} tasks={tasks} />
+      )}
       <DndContext
         onDragStart={onDragStart}
         onDragOver={onDragOver}
         sensors={sensors}
       >
         <div>
-          <div className="text-center items-center mt-6">
-            <input
-              autoFocus
-              className="text-center text-4xl w-full outline-none text-red-500 pb-2"
-              onChange={(e) =>
-                updateWorkspaceName(workspace.id, e.target.value)
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  toggleEditMode();
+          {editMode ? (
+            <div className="text-center items-center mt-6">
+              <input
+                autoFocus
+                className="text-center text-4xl w-full outline-none text-red-500 pb-2"
+                onChange={(e) =>
+                  updateWorkspaceName(workspace.id, e.target.value)
                 }
-              }}
-              defaultValue={workspace.name}
-            />
-            <div className="w-1/2 m-auto h-[1px] bg-red-500"></div>
-          </div>
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    toggleEditMode();
+                  }
+                }}
+                defaultValue={workspace.name}
+              />
+              <div className="w-1/2 m-auto h-[1px] bg-red-500"></div>
+            </div>
+          ) : (
+            <div className="text-center mt-6" onClick={toggleEditMode}>
+              <h1 className="text-4xl border-b inline-block pb-2 border-black">
+                {workspace.name}
+              </h1>
+            </div>
+          )}
           <div className="m-auto flex gap-4 overflow-y-scroll">
             <div className="m-auto flex items-center p-4">
               {cards
@@ -182,51 +194,7 @@ function Workspace() {
           document.body
         )}
       </DndContext>
-    );
-  }
-
-  return (
-    <DndContext
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      sensors={sensors}
-    >
-      <div>
-        <div className="text-center mt-6 " onClick={toggleEditMode}>
-          <h1 className="text-4xl border-b inline-block pb-2 border-black">
-            {workspace.name}
-          </h1>
-        </div>
-        <div className="m-auto flex gap-4 overflow-y-scroll">
-          <div className="m-auto flex items-center p-4">
-            {cards
-              .sort((a, b) => a.order - b.order)
-              .map((card) => (
-                <Card
-                  key={card.id}
-                  card={card}
-                  createTask={createTask}
-                  tasks={tasks.filter((task) => task.card_id === card.id)}
-                  updateTaskContent={updateTaskContent}
-                  removeTask={removeTask}
-                />
-              ))}
-          </div>
-        </div>
-      </div>
-      {createPortal(
-        <DragOverlay>
-          {activeTask && (
-            <Task
-              task={activeTask}
-              updateTaskContent={updateTaskContent}
-              removeTask={removeTask}
-            />
-          )}
-        </DragOverlay>,
-        document.body
-      )}
-    </DndContext>
+    </div>
   );
 
   // function createNewCard(id: Id, name: string = "New Card", order: number) {

@@ -1,4 +1,4 @@
-const Header: React.FC = () => {
+function Header() {
   const token = localStorage.getItem("token");
 
   return (
@@ -34,6 +34,6 @@ const Header: React.FC = () => {
       </div>
     </nav>
   );
-};
+}
 
 export default Header;

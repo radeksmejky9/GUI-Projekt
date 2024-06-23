@@ -95,7 +95,10 @@ function Card({
             description: "TASKHAHAHA",
             deadline: new Date().toISOString(),
             start_date: new Date().toISOString(),
-            completion_date: new Date().toISOString(),
+            completion_date:
+              card.name == "Done"
+                ? new Date().toISOString()
+                : new Date(0).toISOString(),
             order: tasks.length + 1,
           };
           createTask(newTask, card.id);

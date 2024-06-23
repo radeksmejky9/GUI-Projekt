@@ -1,9 +1,7 @@
-import CIcon from "@coreui/icons-react";
 import { addWorkspace, deleteWorkspace, fetchWorkspaces } from "../apis/api";
 import TrashIcon from "../icons/TrashIcon";
 import { WorkspaceInterface } from "../types/types";
 import { useState, useEffect } from "react";
-import { cilTrash } from "@coreui/icons";
 
 function Home() {
   const [workspaces, setWorkspaces] = useState<WorkspaceInterface[]>([]);

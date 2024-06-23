@@ -23,7 +23,6 @@ function App() {
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
         { path: "*", element: <div>Not Found</div> },
-        { path: "graph", element: <Chart /> },
       ],
     },
   ]);
