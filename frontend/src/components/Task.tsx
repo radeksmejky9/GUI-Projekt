@@ -96,14 +96,19 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
         <input
           type="date"
           className="text-lg text-left text-gray-800 border border-gray-300 outline-none w-full px-3 py-2 mb-3 rounded-md"
-          defaultValue={task.start_date}
+          defaultValue={new Date(task.start_date).toISOString().split("T")[0]}
           onChange={(e) =>
             updateTaskContent(
               task.id,
               "start_date",
-              new Date(e.target.value).toISOString()
+              new Date(new Date(e.target.value).getTime()).toISOString()
             )
           }
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              toggleEditMode();
+            }
+          }}
         />
         <label className="block text-sm font-medium text-gray-700">
           End Date
@@ -111,7 +116,7 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
         <input
           type="date"
           className="text-lg text-left text-gray-800 border border-gray-300 outline-none w-full px-3 py-2 mb-3 rounded-md"
-          defaultValue={task.completion_date}
+          defaultValue={new Date(task.deadline).toLocaleDateString()}
           onChange={(e) =>
             updateTaskContent(
               task.id,
@@ -119,11 +124,16 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
               new Date(e.target.value).toISOString()
             )
           }
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              toggleEditMode();
+            }
+          }}
         />
       </div>
     );
   }
-
+  console.log(task.start_date);
   return (
     <div
       ref={setNodeRef}
@@ -153,17 +163,17 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
                 Completed on:{""}
                 <span className="text-lime-700">
                   {" "}
-                  {new Date(task.completion_date).toISOString().split("T")[0]}
+                  {new Date(task.completion_date).toLocaleDateString()}
                 </span>
               </p>
             </div>
           ) : (
             <div className="justify-between flex">
               <p className="text-gray-600">
-                {new Date(task.start_date).toISOString().split("T")[0]}
+                {new Date(task.start_date).toLocaleDateString()}
               </p>
               <p className="text-red-400">
-                {new Date(task.deadline).toISOString().split("T")[0]}
+                {new Date(task.deadline).toLocaleDateString()}
               </p>
             </div>
           )}

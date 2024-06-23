@@ -21,6 +21,8 @@ async def get_tasks_in_workspace(
     workspace_id: int, session: Session = Depends(get_session)
 ):
     tasks = session.exec(select(Task).where(Task.workspace_id == workspace_id)).all()
+    for task in tasks:
+        print(task.start_date)
     return tasks
 
 
@@ -49,19 +51,27 @@ async def update_task(
     task = session.get(Task, task_id)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
-
+    
     if task_update.name is not None:
         task.name = task_update.name
+
     if task_update.description is not None:
         task.description = task_update.description
+
+    if task_update.start_date is not None:
+        task.start_date = task_update.start_date
+
     if task_update.completion_date is None:
         task.completion_date = ""
     else:
         task.completion_date = task_update.completion_date
+
     if task_update.deadline is not None:
         task.deadline = task_update.deadline
+
     if task_update.card_name is not None:
         task.card_name = task_update.card_name
+
     if task_update.order is not None:
         task.order = task_update.order
 
