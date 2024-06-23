@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
-from db.schemas import Card, Task, User, Workspace
+from db.schemas import Card, Task, User, Workspace, WorkspaceUser
 from typing import Annotated, List
 from models.token import Token
 from db.database import (
@@ -8,10 +8,23 @@ from db.database import (
     refresh_and_handle_exception,
     get_session,
 )
-from models.workspace_model import TaskUpdateModel, WorkspaceModel, CardModel, TaskModel
+from models.workspace_model import (
+    TaskUpdateModel,
+    WorkspaceModel,
+    CardModel,
+    TaskModel,
+)
 
 router = APIRouter(tags=["workspaces"])
 db_dependency = Annotated[Session, Depends(get_session)]
+
+
+@router.get("/workspaces/{workspace_id}/users", response_model=List[WorkspaceUser])
+async def get_workspaceUsers(workspace_id: int, session: db_dependency):
+    users = session.exec(
+        select(WorkspaceUser).where(WorkspaceUser.workspace_id == workspace_id)
+    ).all()
+    return users
 
 
 @router.get("/token/{token}/workspaces", response_model=List[Workspace])
@@ -51,6 +64,19 @@ async def get_tasks_in_workspace(
         select(Task).join(Card).where(Card.workspace_id == workspace_id)
     ).all()
     return tasks
+
+
+@router.post("/workspaces/{workspace_id}/users", response_model=List[User])
+async def create_workspaceUsers(
+    workspace_id: int,
+    Users: List[User],
+    session: Session = Depends(get_session),
+):
+    for user in Users:
+        workspaceUser = WorkspaceUser(workspace_id=workspace_id, user_id=user.id)
+        session.add(workspaceUser)
+    commit_and_handle_exception(session)
+    return Users
 
 
 @router.post("/workspaces/{token}", response_model=Workspace)
@@ -187,5 +213,26 @@ async def delete_workspace(workspace_id: int, session: Session = Depends(get_ses
         return {
             "detail": "Workspace and its related cards and tasks deleted successfully"
         }
+
+    raise HTTPException(status_code=404, detail="Workspace not found")
+
+
+@router.delete("/workspaces/{workspace_id}/users")
+async def delete_workspaceUser(
+    workspace_id: int, Users: List[User], session: Session = Depends(get_session)
+):
+    workspace = session.get(Workspace, workspace_id)
+    if workspace:
+        for user in Users:
+            workspace_user = session.exec(
+                select(WorkspaceUser).where(
+                    WorkspaceUser.workspace_id == workspace_id
+                    and WorkspaceUser.user_id == user.id
+                )
+            ).first()
+            if workspace_user:
+                session.delete(workspace_user)
+        session.commit()
+        return {"detail": "Users deleted from workspace successfully"}
 
     raise HTTPException(status_code=404, detail="Workspace not found")
