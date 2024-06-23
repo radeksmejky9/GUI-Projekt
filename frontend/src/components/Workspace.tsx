@@ -145,7 +145,7 @@ function Workspace() {
   //reorderCards();
 
   return (
-    <div>
+    <div className="">
       {tasks.length > 0 && workspace_id && (
         <Chart workspace_id={workspace_id} tasks={tasks} />
       )}
@@ -186,6 +186,7 @@ function Workspace() {
                   getUsers={getUsers}
                   isOpen={modalIsOpen}
                   onAfterOpen={() => {}}
+                  onRequestAddUsers={addUsersToWorkspace}
                   onRequestClose={closeModal}
                 />
               </div>
@@ -358,6 +359,8 @@ function Workspace() {
       .map((user) => ({ ...user }));
     return editedUsers;
   }
+
+  function addUsersToWorkspace(users: UserInterface[]) {}
 }
 
 export default Workspace;

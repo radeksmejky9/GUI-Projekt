@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { UserInterface } from "../types/types";
 
@@ -6,6 +6,7 @@ interface Props {
   getUsers: () => Promise<UserInterface[]>;
   isOpen: boolean;
   onAfterOpen: () => void;
+  onRequestAddUsers: (users: UserInterface[]) => void;
   onRequestClose: () => void;
 }
 
@@ -13,6 +14,7 @@ function SelectUserModal({
   getUsers,
   isOpen,
   onAfterOpen,
+  onRequestAddUsers,
   onRequestClose,
 }: Props) {
   const [users, setUsers] = useState<UserInterface[]>([]);
@@ -22,12 +24,10 @@ function SelectUserModal({
     if (isOpen) {
       getUsers()
         .then((fetchedUsers: UserInterface[]) => {
-          console.log(fetchedUsers);
           setUsers(fetchedUsers);
         })
         .catch((error: any) => {
           console.error("Error fetching users:", error);
-          // Handle error if needed
         });
     }
   }, [isOpen, getUsers]);
@@ -48,17 +48,21 @@ function SelectUserModal({
       onRequestClose={onRequestClose}
       contentLabel="Select Users Modal"
       className="fixed inset-0 flex items-center justify-center"
-      overlayClassName="bg-black bg-opacity-50"
     >
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h2 className="text-lg font-bold mb-4">Select Users</h2>
-        <div>
+        <div className="overflow-y-auto max-h-[200px]">
           {users.map((user) => (
             <div
               key={user.id}
-              className={`flex items-center mb-2 cursor-pointer ${
-                selectedUsers.includes(user) ? "bg-blue-200" : ""
+              className={`flex items-center mb-2 cursor-pointer rounded-md overflow-hidden ${
+                selectedUsers.some(
+                  (selectedUser) => selectedUser.id === user.id
+                )
+                  ? "bg-blue-400"
+                  : ""
               }`}
+              style={{ maxWidth: "200px" }} // Limiting width
               onClick={() => toggleUserSelection(user)}
             >
               {user.profile_picture_url ? (
@@ -87,6 +91,7 @@ function SelectUserModal({
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
             onClick={() => {
               console.log("Selected Users: ", selectedUsers);
+              onRequestAddUsers(selectedUsers);
               onRequestClose();
             }}
           >
