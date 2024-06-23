@@ -8,14 +8,16 @@ import Task from "./Task";
 import { useMemo } from "react";
 
 interface Props {
+  workspace_id: number;
   card: CardInterface;
   tasks: TaskInterface[];
-  createTask: (task: TaskCreationInterface, card_id: number) => void;
+  createTask: (task: TaskCreationInterface) => void;
   updateTaskContent: (id: number, field: string, value: string) => void;
   removeTask: (task: TaskInterface) => void;
 }
 
 function Card({
+  workspace_id,
   card,
   tasks,
   createTask,
@@ -27,14 +29,14 @@ function Card({
   }, [tasks]);
 
   const { setNodeRef } = useSortable({
-    id: card.id,
+    id: card.name,
     data: {
       type: "Card",
       card,
     },
   });
 
-  reorder();
+  reorderTasks();
   return (
     <div
       ref={setNodeRef}
@@ -64,16 +66,17 @@ function Card({
           const newTask = {
             name: "New Task",
             description: "Enter task description",
-            deadline: new Date().toISOString(),
             start_date: new Date().toISOString(),
             completion_date:
               card.name == "Done"
                 ? new Date().toISOString()
                 : new Date(0).toISOString(),
+            card_name: card.name,
             order: tasks.length + 1,
+            workspace_id: workspace_id,
           };
 
-          createTask(newTask, card.id);
+          createTask(newTask);
         }}
         className="flex items-center justify-center bg-gray-400 hover:bg-lime-500 rounded-b-md p-2 cursor-pointer"
       >
@@ -82,7 +85,7 @@ function Card({
     </div>
   );
 
-  function reorder() {
+  function reorderTasks() {
     var orderMin = 1;
     tasks.forEach((task) => (task.order = orderMin++));
   }

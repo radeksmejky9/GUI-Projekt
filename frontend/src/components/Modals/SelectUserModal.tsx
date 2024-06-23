@@ -35,7 +35,7 @@ function SelectUserModal({
           console.error("Error fetching users:", error);
         });
     }
-  }, [isOpen, getUsers]);
+  }, [isOpen, getUsers, users]);
 
   return (
     <Modal
@@ -65,11 +65,13 @@ function SelectUserModal({
               {user.profile_picture_url ? (
                 <img
                   src={user.profile_picture_url}
+                  alt="User Profile"
                   className="h-8 w-8 rounded-full mr-2"
                 />
               ) : (
                 <img
                   src={"https://i.imgur.com/V4RclNb.png"}
+                  alt="User Profile"
                   className="h-8 w-8 rounded-full mr-2"
                 />
               )}

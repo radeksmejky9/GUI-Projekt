@@ -9,21 +9,26 @@ export type UserInterface = {
 };
 
 export type CardInterface = {
-  id: number;
-  order: number;
   name: string;
 };
 export type TaskInterface = {
   id: number;
   name: string;
   description: string;
-  deadline?: string;
   start_date: string;
   completion_date: string;
-  card_id: number;
+  card_name: string;
   order: number;
-  isInEditMode?: boolean;
   [key: string | number]: any;
+};
+
+export type TaskCreationInterface = {
+  name: string;
+  description: string;
+  start_date: string;
+  completion_date: string;
+  card_name: string;
+  order: number;
 };
 
 export type WorkspaceInterface = {
@@ -32,22 +37,6 @@ export type WorkspaceInterface = {
   owner_id: number;
 };
 
-export type TaskCreationInterface = {
-  name: string;
-  description: string;
-  deadline?: string;
-  start_date: string;
-  completion_date?: string;
-  order: number;
-};
-
-export type CardCreationInterface = {
-  name: string;
-  order: number;
-};
-
 export type WorkspaceCreationInterface = {
   name: string;
 };
-
-export type Id = string | number;

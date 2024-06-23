@@ -15,22 +15,8 @@ import {
   TaskCreationInterface,
   UserInterface,
 } from "../types/types";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  addCard,
-  addTask,
-  addUsersToWorkspace,
-  deleteTask,
-  deleteUsersFromWorkspace,
-  fetchCards,
-  fetchTasks,
-  fetchUsers,
-  fetchWorkspace,
-  fetchWorkspaceUsers,
-  updateTask,
-  updateWorkspace,
-} from "../apis/api";
 import { createPortal } from "react-dom";
 import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -38,27 +24,28 @@ import Chart from "./Chart";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "jsonwebtoken";
 import SelectUserModal from "./modals/SelectUserModal";
+import {
+  fetchTasks,
+  fetchUsers,
+  fetchWorkspace,
+  fetchWorkspaceUsers,
+} from "../apis/api_get";
+import { addTask, addWorkspaceUsers } from "../apis/api_post";
+import { updateTask, updateWorkspace } from "../apis/api_put";
+import { deleteTask, deleteUsersFromWorkspace } from "../apis/api_delete";
 
 const defaultCards: CardInterface[] = [
   {
-    id: 1,
     name: "To-do",
-    order: 1,
   },
   {
-    id: 2,
     name: "Doing",
-    order: 2,
   },
   {
-    id: 3,
     name: "Testing",
-    order: 3,
   },
   {
-    id: 4,
     name: "Done",
-    order: 4,
   },
 ];
 const defaultWorkspace: WorkspaceInterface = {
@@ -70,12 +57,11 @@ const defaultWorkspace: WorkspaceInterface = {
 function Workspace() {
   const { workspace_id } = useParams<{ workspace_id: any }>();
   const [users, SetUsers] = useState<UserInterface[]>([]);
-  const [cards, setCards] = useState<CardInterface[]>([]);
+  const cards = defaultCards;
   const [tasks, setTasks] = useState<TaskInterface[]>([]);
   const [workspace, setWorkspace] =
     useState<WorkspaceInterface>(defaultWorkspace);
   const [activeTask, setActiveTask] = useState<TaskInterface | null>(null);
-  const hasAddedDefaultCards = useRef(false);
   const [modalIsOpen, setIsOpen] = useState(false);
 
   const openModal = () => {
@@ -98,18 +84,6 @@ function Workspace() {
       try {
         const workspaceData = await fetchWorkspace(workspace_id);
         setWorkspace(workspaceData);
-
-        const cardsData = await fetchCards(workspace_id);
-        if (cardsData.length === 0 && !hasAddedDefaultCards.current) {
-          hasAddedDefaultCards.current = true;
-          const promises = defaultCards.map((card) =>
-            addCard({ name: card.name, order: card.order }, workspace_id)
-          );
-          await Promise.all(promises);
-          setCards(defaultCards);
-        } else {
-          setCards(cardsData);
-        }
 
         const workspaceUsers = await fetchWorkspaceUsers(workspace_id);
         SetUsers(workspaceUsers);
@@ -188,7 +162,7 @@ function Workspace() {
                   {workspace.name}
                 </h1>
 
-                {workspace.id == decodedToken.id && (
+                {workspace.id === decodedToken.id && (
                   <div className="text-3xl">
                     <button onClick={() => openModal()}>Add User</button>
                     <SelectUserModal
@@ -205,18 +179,17 @@ function Workspace() {
             )}
             <div className="m-auto flex gap-4 overflow-y-scroll">
               <div className="m-auto flex items-center p-4">
-                {cards
-                  .sort((a, b) => a.order - b.order)
-                  .map((card) => (
-                    <Card
-                      key={card.id}
-                      card={card}
-                      createTask={createTask}
-                      tasks={tasks.filter((task) => task.card_id === card.id)}
-                      updateTaskContent={updateTaskContent}
-                      removeTask={removeTask}
-                    />
-                  ))}
+                {cards.map((card) => (
+                  <Card
+                    key={card.name}
+                    workspace_id={workspace_id}
+                    card={card}
+                    createTask={createTask}
+                    tasks={tasks.filter((task) => task.card_name === card.name)}
+                    updateTaskContent={updateTaskContent}
+                    removeTask={removeTask}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -245,8 +218,8 @@ function Workspace() {
     );
   }
 
-  function createTask(newTask: TaskCreationInterface, card_id: number) {
-    addTask(newTask, card_id).then((task) => {
+  function createTask(newTask: TaskCreationInterface) {
+    addTask(newTask).then((task: TaskInterface) => {
       setTasks([...tasks, task]);
     });
   }
@@ -263,7 +236,10 @@ function Workspace() {
     if (!over) return;
 
     const activeId = active.id;
-    const overId = Number(over.id);
+    const overId =
+      over.data.current?.type === "Card"
+        ? over.data.current?.card.name
+        : over.id;
 
     if (activeId === overId) return;
 
@@ -277,8 +253,8 @@ function Workspace() {
         const activeIndex = tasks.findIndex((task) => task.id === activeId);
         const overIndex = tasks.findIndex((task) => task.id === overId);
 
-        if (tasks[activeIndex].card_id !== tasks[overIndex].card_id) {
-          tasks[activeIndex].card_id = tasks[overIndex].card_id;
+        if (tasks[activeIndex].card_name !== tasks[overIndex].card_name) {
+          tasks[activeIndex].card_name = tasks[overIndex].card_name;
           return arrayMove(tasks, activeIndex, overIndex - 1);
         }
 
@@ -290,8 +266,8 @@ function Workspace() {
     if (isActiveATask && isOverACard) {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((task) => task.id === activeId);
-        tasks[activeIndex].card_id = overId;
-        if (tasks[activeIndex].card_id === cards[cards.length - 1].id) {
+        tasks[activeIndex].card_name = overId;
+        if (tasks[activeIndex].card_name === cards[cards.length - 1].name) {
           tasks[activeIndex].completion_date = new Date().toISOString();
         } else {
           tasks[activeIndex].completion_date = new Date(0).toISOString();
@@ -331,7 +307,7 @@ function Workspace() {
   }
 
   async function getUsers(): Promise<UserInterface[]> {
-    const users = await fetchUsers();
+    const users: UserInterface[] = await fetchUsers();
     const editedUsers: UserInterface[] = users
       .filter((user) => user.id !== workspace.owner_id)
       .map((user) => ({ ...user }));
@@ -340,7 +316,7 @@ function Workspace() {
 
   function addUsers(users: UserInterface[]) {
     deleteUsersFromWorkspace(workspace.id).then(() =>
-      addUsersToWorkspace(workspace.id, users)
+      addWorkspaceUsers(workspace.id, users)
     );
   }
 }

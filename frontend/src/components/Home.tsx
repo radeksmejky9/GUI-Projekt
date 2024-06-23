@@ -1,10 +1,12 @@
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "jsonwebtoken";
-import { addWorkspace, deleteWorkspace, fetchWorkspaces } from "../apis/api";
 import TrashIcon from "./icons/TrashIcon";
 import { WorkspaceInterface } from "../types/types";
 import { useState, useEffect } from "react";
 import DeleteWorkspaceModal from "./modals/DeleteWorkspaceModal";
+import { fetchWorkspaces } from "../apis/api_get";
+import { addWorkspace } from "../apis/api_post";
+import { deleteWorkspace } from "../apis/api_delete";
 
 function Home() {
   const [workspaces, setWorkspaces] = useState<WorkspaceInterface[]>([]);
