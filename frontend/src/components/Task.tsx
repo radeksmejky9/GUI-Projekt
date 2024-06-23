@@ -61,7 +61,7 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
       >
         <input
           className="text-lg font-semibold text-left text-gray-800 border border-gray-300 outline-none w-full px-3 py-2 mb-3 rounded-md"
-          defaultValue={task.name == "New Task" ? "" : task.name}
+          defaultValue={task.name === "New Task" ? "" : task.name}
           onChange={(e) => updateTaskContent(task.id, "name", e.target.value)}
           placeholder="Your task name here"
           onBlur={toggleEditMode}
@@ -74,7 +74,9 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
         <textarea
           className="text-lg text-left text-gray-600 border border-gray-300 outline-none w-full px-3 py-2 rounded-md"
           defaultValue={
-            task.description == "Enter task description" ? "" : task.description
+            task.description === "Enter task description"
+              ? ""
+              : task.description
           }
           placeholder="Your task description here"
           onChange={(e) =>
@@ -87,6 +89,36 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
             }
           }}
           style={{ minHeight: "50px" }}
+        />
+        <label className="block text-sm font-medium text-gray-700 mt-2">
+          Start Date
+        </label>
+        <input
+          type="date"
+          className="text-lg text-left text-gray-800 border border-gray-300 outline-none w-full px-3 py-2 mb-3 rounded-md"
+          defaultValue={task.start_date}
+          onChange={(e) =>
+            updateTaskContent(
+              task.id,
+              "start_date",
+              new Date(e.target.value).toISOString()
+            )
+          }
+        />
+        <label className="block text-sm font-medium text-gray-700">
+          End Date
+        </label>
+        <input
+          type="date"
+          className="text-lg text-left text-gray-800 border border-gray-300 outline-none w-full px-3 py-2 mb-3 rounded-md"
+          defaultValue={task.completion_date}
+          onChange={(e) =>
+            updateTaskContent(
+              task.id,
+              "deadline",
+              new Date(e.target.value).toISOString()
+            )
+          }
         />
       </div>
     );
@@ -105,13 +137,37 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
       onMouseLeave={() => {
         setMouseIsOver(false);
       }}
-      className="max-h-[100px] min-h-[100px] relative bg-gray-200 my-2 p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out"
+      className=" relative bg-gray-200 my-2 p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out"
     >
       <h1 className="text-lg font-semibold text-left text-gray-800">
         {task.name}
       </h1>
       <div className="mt-2 overflow-y-auto h-[50px] break-all">
         <p className="text-gray-600">{task.description}</p>
+      </div>
+      <div className="mt-2">
+        <div className="">
+          {task.card_name === "Done" ? (
+            <div className="text-center">
+              <p className="inline-block">
+                Completed on:{""}
+                <span className="text-lime-700">
+                  {" "}
+                  {new Date(task.completion_date).toISOString().split("T")[0]}
+                </span>
+              </p>
+            </div>
+          ) : (
+            <div className="justify-between flex">
+              <p className="text-gray-600">
+                {new Date(task.start_date).toISOString().split("T")[0]}
+              </p>
+              <p className="text-red-400">
+                {new Date(task.deadline).toISOString().split("T")[0]}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
       {mouseIsOver && (
         <button

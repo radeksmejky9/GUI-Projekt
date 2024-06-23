@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
-const Login: React.FC = () => {
+function Login() {
   const [userCredentials, setUserCredentials] = useState({
     username: "",
     password: "",
@@ -9,6 +9,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
+
   useEffect(() => {
     if (token) {
       try {
@@ -28,6 +29,7 @@ const Login: React.FC = () => {
       }
     }
   }, [token]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserCredentials((prevState) => ({
       ...prevState,
@@ -130,6 +132,6 @@ const Login: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Login;

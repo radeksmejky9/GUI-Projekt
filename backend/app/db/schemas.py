@@ -52,8 +52,9 @@ class Task(SQLModel, table=True):
     name: str
     description: Optional[str] = None
     start_date: Optional[datetime] = None
-    order: Optional[int] = None
     completion_date: Optional[datetime] = None
+    deadline: Optional[datetime] = None
+    order: Optional[int] = None
     card_name: str
     workspace_id: int = Field(foreign_key="workspaces.id")
 

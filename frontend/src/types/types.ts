@@ -17,6 +17,7 @@ export type TaskInterface = {
   description: string;
   start_date: string;
   completion_date: string;
+  deadline: string;
   card_name: string;
   order: number;
   [key: string | number]: any;
@@ -27,6 +28,7 @@ export type TaskCreationInterface = {
   description: string;
   completion_date: string;
   start_date: string;
+  deadline: string;
   order: number;
   card_name: string;
 };

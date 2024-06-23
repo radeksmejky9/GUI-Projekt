@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Register: React.FC = () => {
+function Register() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [newUser, setNewUser] = useState({
@@ -184,6 +184,6 @@ const Register: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Register;
