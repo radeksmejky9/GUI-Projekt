@@ -9,7 +9,7 @@ export type TaskInterface = {
   description: string;
   deadline?: string;
   start_date: string;
-  completion_date?: string;
+  completion_date: string;
   card_id: number;
   order: number;
   [key: string | number]: any;
