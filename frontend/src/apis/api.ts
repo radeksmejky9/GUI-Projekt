@@ -8,6 +8,9 @@ import {
 } from "../types/types";
 
 export async function fetchUsers() {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/users`
@@ -22,7 +25,11 @@ export async function fetchUsers() {
     throw error;
   }
 }
+
 export async function fetchCards(workspace_id: number) {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/cards`
@@ -38,6 +45,9 @@ export async function fetchCards(workspace_id: number) {
 }
 
 export async function fetchTasks(workspace_id: number) {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/tasks`
@@ -53,6 +63,9 @@ export async function fetchTasks(workspace_id: number) {
 }
 
 export async function fetchWorkspaces() {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${
@@ -70,6 +83,9 @@ export async function fetchWorkspaces() {
 }
 
 export async function fetchWorkspace(workspace_id: number) {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}`
@@ -89,6 +105,9 @@ export async function addCard(
   card: CardCreationInterface,
   workspace_id: number
 ) {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/cards`,
@@ -115,9 +134,8 @@ export async function addWorkspace(
   workspace: WorkspaceCreationInterface,
   token: string
 ) {
-  if (token === "") {
-    console.log("Token is empty");
-    return;
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
   }
   try {
     const response = await fetch(
@@ -142,6 +160,9 @@ export async function addWorkspace(
 }
 
 export async function addTask(task: TaskCreationInterface, card_id: number) {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/cards/${card_id}/tasks`,
@@ -165,6 +186,9 @@ export async function addTask(task: TaskCreationInterface, card_id: number) {
 }
 
 export async function updateTask(task: TaskCreationInterface, task_id: number) {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/tasks/${task_id}`,
@@ -191,6 +215,9 @@ export async function updateWorkspace(
   workspace: WorkspaceCreationInterface,
   workspace_id: number
 ) {
+  if (localStorage.getItem("token") === null) {
+    throw new Error("You have to be logged in.");
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}`,
@@ -215,6 +242,9 @@ export async function updateWorkspace(
 
 export async function deleteWorkspace(workspace_id: number) {
   try {
+    if (localStorage.getItem("token") === null) {
+      throw new Error("You have to be logged in.");
+    }
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}`,
       {
@@ -239,6 +269,9 @@ export async function deleteWorkspace(workspace_id: number) {
 
 export async function deleteTask(task_id: number) {
   try {
+    if (localStorage.getItem("token") === null) {
+      throw new Error("You have to be logged in.");
+    }
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/tasks/${task_id}`,
       {
