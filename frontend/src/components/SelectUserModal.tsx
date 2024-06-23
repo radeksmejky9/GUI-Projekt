@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { UserInterface } from "../types/types";
+import { useResizeObserver } from "@dnd-kit/core/dist/hooks/utilities";
 
 interface Props {
+  users: UserInterface[];
   getUsers: () => Promise<UserInterface[]>;
   isOpen: boolean;
   onAfterOpen: () => void;
@@ -11,34 +13,31 @@ interface Props {
 }
 
 function SelectUserModal({
+  users,
   getUsers,
   isOpen,
   onAfterOpen,
   onRequestAddUsers,
   onRequestClose,
 }: Props) {
-  const [users, setUsers] = useState<UserInterface[]>([]);
+  const [allUsers, setAllUsers] = useState<UserInterface[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<UserInterface[]>([]);
 
   useEffect(() => {
     if (isOpen) {
       getUsers()
         .then((fetchedUsers: UserInterface[]) => {
-          setUsers(fetchedUsers);
+          console.log(users);
+          setAllUsers(fetchedUsers);
+          users.forEach((user) => {
+            toggleUserSelection(user);
+          });
         })
         .catch((error: any) => {
           console.error("Error fetching users:", error);
         });
     }
   }, [isOpen, getUsers]);
-
-  const toggleUserSelection = (user: UserInterface) => {
-    if (selectedUsers.includes(user)) {
-      setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
-    } else {
-      setSelectedUsers([...selectedUsers, user]);
-    }
-  };
 
   return (
     <Modal
@@ -52,7 +51,7 @@ function SelectUserModal({
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h2 className="text-lg font-bold mb-4">Select Users</h2>
         <div className="overflow-y-auto max-h-[200px]">
-          {users.map((user) => (
+          {allUsers.map((user) => (
             <div
               key={user.id}
               className={`flex items-center mb-2 cursor-pointer rounded-md overflow-hidden ${
@@ -101,6 +100,14 @@ function SelectUserModal({
       </div>
     </Modal>
   );
+
+  function toggleUserSelection(user: UserInterface) {
+    if (selectedUsers.includes(user)) {
+      setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
+    } else {
+      setSelectedUsers([...selectedUsers, user]);
+    }
+  }
 }
 
 export default SelectUserModal;
