@@ -35,9 +35,9 @@ import { createPortal } from "react-dom";
 import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
 import Chart from "./Chart";
-import SelectUserModal from "./modals/SelectUserModal";
 import { jwtDecode } from "jwt-decode";
 import { JwtPayload } from "jsonwebtoken";
+import SelectUserModal from "./modals/SelectUserModal";
 
 const defaultCards: CardInterface[] = [
   {
@@ -92,64 +92,64 @@ function Workspace() {
     setEditMode((prev) => !prev);
   };
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const workspaceData = await fetchWorkspace(workspace_id);
+        setWorkspace(workspaceData);
+
+        const cardsData = await fetchCards(workspace_id);
+        if (cardsData.length === 0 && !hasAddedDefaultCards.current) {
+          hasAddedDefaultCards.current = true;
+          const promises = defaultCards.map((card) =>
+            addCard({ name: card.name, order: card.order }, workspace_id)
+          );
+          await Promise.all(promises);
+          setCards(defaultCards);
+        } else {
+          setCards(cardsData);
+        }
+
+        const workspaceUsers = await fetchWorkspaceUsers(workspace_id);
+        SetUsers(workspaceUsers);
+      } catch (error: any) {
+        console.error("Error:", error.message);
+      }
+    };
+
+    if (workspace_id) {
+      fetchData();
+    }
+  }, [workspace_id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tasksData: TaskInterface[] = await fetchTasks(workspace_id);
+
+        setTasks(tasksData);
+      } catch (error: any) {
+        console.error("Error:", error.message);
+      }
+    };
+
+    if (cards.length > 0 && workspace_id) {
+      fetchData();
+    }
+  }, [cards, workspace_id]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    })
+  );
+
+  //reorderCards();
   if (token != null) {
     const decodedToken = jwtDecode<JwtPayload>(token);
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const workspaceData = await fetchWorkspace(workspace_id);
-          setWorkspace(workspaceData);
-
-          const cardsData = await fetchCards(workspace_id);
-          if (cardsData.length === 0 && !hasAddedDefaultCards.current) {
-            hasAddedDefaultCards.current = true;
-            const promises = defaultCards.map((card) =>
-              addCard({ name: card.name, order: card.order }, workspace_id)
-            );
-            await Promise.all(promises);
-            setCards(defaultCards);
-          } else {
-            setCards(cardsData);
-          }
-
-          const workspaceUsers = await fetchWorkspaceUsers(workspace_id);
-          SetUsers(workspaceUsers);
-        } catch (error: any) {
-          console.error("Error:", error.message);
-        }
-      };
-
-      if (workspace_id) {
-        fetchData();
-      }
-    }, [workspace_id]);
-
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const tasksData: TaskInterface[] = await fetchTasks(workspace_id);
-
-          setTasks(tasksData);
-        } catch (error: any) {
-          console.error("Error:", error.message);
-        }
-      };
-
-      if (cards.length > 0 && workspace_id) {
-        fetchData();
-      }
-    }, [cards, workspace_id]);
-
-    const sensors = useSensors(
-      useSensor(PointerSensor, {
-        activationConstraint: {
-          distance: 10,
-        },
-      })
-    );
-
-    //reorderCards();
-
     return (
       <div className="">
         {tasks.length > 0 && workspace_id && (
