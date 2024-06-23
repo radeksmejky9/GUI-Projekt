@@ -27,6 +27,7 @@ import {
   fetchTasks,
   fetchUsers,
   fetchWorkspace,
+  fetchWorkspaceUsers,
   updateTask,
   updateWorkspace,
 } from "../apis/api";
@@ -70,6 +71,7 @@ function Workspace() {
   /*const [activeCard, setActiveCard] = useState<CardInterface | null>(null);*/
 
   const { workspace_id } = useParams<{ workspace_id: any }>();
+  const [users, SetUsers] = useState<UserInterface[]>([]);
   const [cards, setCards] = useState<CardInterface[]>([]);
   const [tasks, setTasks] = useState<TaskInterface[]>([]);
   const [workspace, setWorkspace] =
@@ -110,6 +112,9 @@ function Workspace() {
         } else {
           setCards(cardsData);
         }
+
+        const workspaceUsers = await fetchWorkspaceUsers(workspace_id);
+        SetUsers(workspaceUsers);
       } catch (error: any) {
         console.error("Error:", error.message);
       }
@@ -185,6 +190,7 @@ function Workspace() {
               <div className="text-3xl">
                 <button onClick={() => openModal()}>Add User</button>
                 <SelectUserModal
+                  users={users}
                   getUsers={getUsers}
                   isOpen={modalIsOpen}
                   onAfterOpen={() => {}}
@@ -363,8 +369,9 @@ function Workspace() {
   }
 
   function addUsers(users: UserInterface[]) {
-    deleteUsersFromWorkspace(workspace.id);
-    addUsersToWorkspace(workspace.id, users);
+    deleteUsersFromWorkspace(workspace.id).then(() =>
+      addUsersToWorkspace(workspace.id, users)
+    );
   }
 }
 

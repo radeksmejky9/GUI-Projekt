@@ -26,6 +26,25 @@ export async function fetchUsers() {
   }
 }
 
+export async function fetchWorkspaceUsers(workspace_id: number) {
+  if (localStorage.getItem("token") === null)
+    throw new Error("You have to be logged in.");
+
+  try {
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${workspace_id}/users`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch cards");
+    }
+    const users: UserInterface[] = await response.json();
+    return users;
+  } catch (error: any) {
+    console.error("Error fetching cards:", error.message);
+    throw error;
+  }
+}
+
 export async function fetchCards(workspace_id: number) {
   if (localStorage.getItem("token") === null) {
     throw new Error("You have to be logged in.");
