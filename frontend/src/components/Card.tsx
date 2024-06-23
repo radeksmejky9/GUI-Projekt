@@ -59,24 +59,18 @@ function Card({
   return (
     <div
       ref={setNodeRef}
-      /*style={style}*/
       className="bg-gray-200 w-[350px] h-[500px] max-h-[500px] rounded-md flex flex-col m-1"
     >
       {/* Header */}
-      <div
-        /*{...attributes}
-        {...listeners}*/
-        className="bg-gray-400 text-xl rounded-md rounded-b-none p-2 font-bold border-4 border-gray-200 justify-between flex items-center"
-      >
-        <div className="flex gap-2">
-          <h1 className="">{card.name}</h1>
-        </div>
+      <div className="bg-gray-400 text-xl rounded-t-md p-2 font-bold border-b-4 border-gray-200 flex justify-between items-center">
+        <h1>{card.name}</h1>
       </div>
+
       {/* Body */}
       <div className="flex flex-grow flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
         <SortableContext items={tasksIds}>
           {tasks
-            .sort((task) => task.order)
+            .sort((a, b) => a.order - b.order)
             .map((task) => (
               <Task
                 key={task.id}
@@ -87,12 +81,13 @@ function Card({
             ))}
         </SortableContext>
       </div>
+
       {/* Footer */}
       <div
         onClick={() => {
-          const newTask: TaskCreationInterface = {
-            name: "TASK123123123123",
-            description: "TASKHAHAHA",
+          const newTask = {
+            name: "New Task",
+            description: "Enter task description",
             deadline: new Date().toISOString(),
             start_date: new Date().toISOString(),
             completion_date:
@@ -101,9 +96,10 @@ function Card({
                 : new Date(0).toISOString(),
             order: tasks.length + 1,
           };
+
           createTask(newTask, card.id);
         }}
-        className="items-center flex bg-gray-400 gap-2 rounded-md hover:bg-lime-500 p-2 cursor-pointer"
+        className="flex items-center justify-center bg-gray-400 hover:bg-lime-500 rounded-b-md p-2 cursor-pointer"
       >
         Add Task
       </div>

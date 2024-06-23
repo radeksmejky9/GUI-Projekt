@@ -13,6 +13,7 @@ import {
   TaskInterface,
   WorkspaceInterface,
   TaskCreationInterface,
+  UserInterface,
 } from "../types/types";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -22,6 +23,7 @@ import {
   deleteTask,
   fetchCards,
   fetchTasks,
+  fetchUsers,
   fetchWorkspace,
   updateTask,
   updateWorkspace,
@@ -31,6 +33,7 @@ import Task from "./Task";
 import { arrayMove } from "@dnd-kit/sortable";
 import TrashIcon from "../icons/TrashIcon";
 import Chart from "./Chart";
+import SelectUserModal from "./SelectUserModal";
 
 const defaultCards: CardInterface[] = [
   {
@@ -56,7 +59,8 @@ const defaultCards: CardInterface[] = [
 ];
 const defaultWorkspace: WorkspaceInterface = {
   id: -1,
-  name: "you should not see this",
+  name: "",
+  owner_id: -1,
 };
 
 function Workspace() {
@@ -70,6 +74,16 @@ function Workspace() {
     useState<WorkspaceInterface>(defaultWorkspace);
   const [activeTask, setActiveTask] = useState<TaskInterface | null>(null);
   const hasAddedDefaultCards = useRef(false);
+
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
 
   const [editMode, setEditMode] = useState(false);
 
@@ -127,6 +141,7 @@ function Workspace() {
       },
     })
   );
+
   //reorderCards();
 
   return (
@@ -158,10 +173,22 @@ function Workspace() {
               <div className="w-1/2 m-auto h-[1px] bg-red-500"></div>
             </div>
           ) : (
-            <div className="text-center mt-6" onClick={toggleEditMode}>
-              <h1 className="text-4xl border-b inline-block pb-2 border-black">
+            <div className="text-center mt-6">
+              <h1
+                onClick={toggleEditMode}
+                className="text-4xl border-b inline-block pb-2 border-black"
+              >
                 {workspace.name}
               </h1>
+              <div className="text-3xl">
+                <button onClick={() => openModal()}>Add User</button>
+                <SelectUserModal
+                  getUsers={getUsers}
+                  isOpen={modalIsOpen}
+                  onAfterOpen={() => {}}
+                  onRequestClose={closeModal}
+                />
+              </div>
             </div>
           )}
           <div className="m-auto flex gap-4 overflow-y-scroll">
@@ -322,6 +349,14 @@ function Workspace() {
   function removeTask(task: TaskInterface) {
     deleteTask(task.id);
     setTasks(tasks.filter((t) => t.id !== task.id));
+  }
+
+  async function getUsers(): Promise<UserInterface[]> {
+    const users = await fetchUsers();
+    const editedUsers: UserInterface[] = users
+      .filter((user) => user.id !== workspace.owner_id)
+      .map((user) => ({ ...user }));
+    return editedUsers;
   }
 }
 

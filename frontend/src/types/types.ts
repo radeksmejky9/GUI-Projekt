@@ -1,3 +1,13 @@
+export type UserInterface = {
+  id: number;
+  username: string;
+  email: string;
+  password_hash: string;
+  first_name: string;
+  last_name: string;
+  profile_picture_url?: string;
+};
+
 export type CardInterface = {
   id: number;
   order: number;
@@ -12,12 +22,14 @@ export type TaskInterface = {
   completion_date: string;
   card_id: number;
   order: number;
+  isInEditMode?: boolean;
   [key: string | number]: any;
 };
 
 export type WorkspaceInterface = {
   id: number;
   name: string;
+  owner_id: number;
 };
 
 export type TaskCreationInterface = {

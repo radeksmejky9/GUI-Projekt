@@ -45,10 +45,7 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
       <div
         ref={setNodeRef}
         style={style}
-        className="
-        opacity-30
-      bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-rose-500  cursor-grab relative
-      "
+        className="opacity-30 my-2 p-4 max-h-[100px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-rose-500  cursor-grab relative "
       />
     );
   }
@@ -60,11 +57,11 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
         style={style}
         {...attributes}
         {...listeners}
-        className="bg-gray-200 my-2 p-2 border-2 border-gray-800 rounded-md h-[100px] min-h-[100px] min-h-[100px] overflow-y-auto overflow-x-hidden"
+        className="bg-gray-200 my-2 p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out"
       >
         <input
-          className="text-lg text-left border outline-none w-full px-2 py-1"
-          defaultValue={task.name}
+          className="text-lg font-semibold text-left text-gray-800 border border-gray-300 outline-none w-full px-3 py-2 mb-3 rounded-md"
+          defaultValue={task.name == "New Task" ? "" : task.name}
           onChange={(e) => updateTaskContent(task.id, "name", e.target.value)}
           placeholder="Your task name here"
           onBlur={toggleEditMode}
@@ -73,23 +70,24 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
               toggleEditMode();
             }
           }}
-        ></input>
-        <div>
-          <textarea
-            className="text-lg text-left border outline-none w-full px-2 py-1"
-            defaultValue={task.description}
-            onChange={(e) =>
-              updateTaskContent(task.id, "description", e.target.value)
+        />
+        <textarea
+          className="text-lg text-left text-gray-600 border border-gray-300 outline-none w-full px-3 py-2 rounded-md"
+          defaultValue={
+            task.description == "Enter task description" ? "" : task.description
+          }
+          placeholder="Your task description here"
+          onChange={(e) =>
+            updateTaskContent(task.id, "description", e.target.value)
+          }
+          onBlur={toggleEditMode}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              toggleEditMode();
             }
-            placeholder="Your task description here"
-            onBlur={toggleEditMode}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                toggleEditMode();
-              }
-            }}
-          ></textarea>
-        </div>
+          }}
+          style={{ minHeight: "50px" }}
+        />
       </div>
     );
   }
@@ -107,15 +105,22 @@ function Task({ task, updateTaskContent, removeTask }: Props) {
       onMouseLeave={() => {
         setMouseIsOver(false);
       }}
-      className="bg-gray-200 my-2 p-2 border-2 border-gray-800 rounded-md h-[100px] min-h-[100px] min-h-[100px] overflow-y-auto overflow-x-hidden"
+      className="max-h-[100px] min-h-[100px] relative bg-gray-200 my-2 p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out"
     >
-      <h1 className="text-lg text-left">{task.name}</h1>
-      <div>
-        <span>{task.description}</span>
+      <h1 className="text-lg font-semibold text-left text-gray-800">
+        {task.name}
+      </h1>
+      <div className="mt-2 overflow-y-auto h-[50px] break-all">
+        <p className="text-gray-600">{task.description}</p>
       </div>
-      <button className="p-3 stroke-black" onClick={() => removeTask(task)}>
-        <TrashIcon />
-      </button>
+      {mouseIsOver && (
+        <button
+          className="absolute top-2 right-2 p-1 stroke-red-500 border-2 border-red-500 rounded-full hover:bg-red-600 hover:border-red-600 hover:stroke-white transition-colors duration-200 ease-in-out"
+          onClick={() => removeTask(task)}
+        >
+          <TrashIcon />
+        </button>
+      )}
     </div>
   );
 }

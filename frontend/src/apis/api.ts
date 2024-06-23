@@ -2,10 +2,26 @@ import {
   CardCreationInterface,
   TaskCreationInterface,
   TaskInterface,
+  UserInterface,
   WorkspaceCreationInterface,
   WorkspaceInterface,
 } from "../types/types";
 
+export async function fetchUsers() {
+  try {
+    const response = await fetch(
+      `http://${process.env.REACT_APP_CONNECTION_IP}:8000/users`
+    );
+    if (!response.ok) {
+      throw new Error("Failed to fetch cards");
+    }
+    const users: UserInterface[] = await response.json();
+    return users;
+  } catch (error: any) {
+    console.error("Error fetching cards:", error.message);
+    throw error;
+  }
+}
 export async function fetchCards(workspace_id: number) {
   try {
     const response = await fetch(
@@ -99,6 +115,10 @@ export async function addWorkspace(
   workspace: WorkspaceCreationInterface,
   token: string
 ) {
+  if (token === "") {
+    console.log("Token is empty");
+    return;
+  }
   try {
     const response = await fetch(
       `http://${process.env.REACT_APP_CONNECTION_IP}:8000/workspaces/${token}`,
