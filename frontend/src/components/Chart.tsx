@@ -18,8 +18,7 @@ import { TaskInterface } from "../types/types"; // Adjust the path as per your p
 import ArrowLeftIcon from "./icons/ArrowLeftIcon";
 import ArrowRightIcon from "./icons/ArrowRightIcon";
 import Velocity from "./plots/Velocity";
-import TaskDistribution from "./plots/Velocity";
-import BurnDown from "./plots/Burndown";
+import TaskDistribution from "./plots/TaskDistribution";
 import CompletionTime from "./plots/CompletionTime";
 
 interface Props {
@@ -35,7 +34,7 @@ const Chart: React.FC<Props> = ({ workspace_id, tasks }) => {
     <div>
       <button
         onClick={() => setIsHidden(!isHidden)}
-        className="bg-gray-800 p-2 text-center flex text-white rounded-r-md hover:bg-gray-900 mt-4 justify-start"
+        className="bg-gray-800 p-2 text-center flex text-white rounded-r-md hover:bg-gray-900 mt-2 justify-start"
       >
         {isHidden ? (
           <div className="flex">
@@ -53,18 +52,11 @@ const Chart: React.FC<Props> = ({ workspace_id, tasks }) => {
       {!isHidden && (
         <div
           tabIndex={-1}
-          className="z-50 fixed grid mt-12 grid-cols-2 rounded-r-md shadow-2xl bg-gray-100 p-4"
+          className="z-50 fixed grid mt-2 grid-cols-1 rounded-r-md shadow-2xl bg-gray-100 p-4"
         >
           <div className="bg-gray-100 rounded-lg text-gray-800">
-            <h2 className="text-xl ml-4 font-bold mb-4">Burn-down Chart</h2>
-            <div tabIndex={-1} className="h-80 w-80">
-              <BurnDown tasks={tasks} />
-            </div>
-          </div>
-
-          <div className="bg-gray-100 rounded-lg text-gray-800">
             <h2 className="text-xl font-bold ml-4 mb-4">Velocity Chart</h2>
-            <div className="h-80 w-80">
+            <div className="h-60 w-60">
               <Velocity tasks={tasks} />
             </div>
           </div>
@@ -73,7 +65,7 @@ const Chart: React.FC<Props> = ({ workspace_id, tasks }) => {
             <h2 className="text-xl ml-4 font-bold mb-4">
               Task Completion Status
             </h2>
-            <div tabIndex={-1} className="h-80 w-80">
+            <div tabIndex={-1} className="h-60 w-60">
               <TaskDistribution tasks={tasks} />
             </div>
           </div>
@@ -82,7 +74,7 @@ const Chart: React.FC<Props> = ({ workspace_id, tasks }) => {
             <h2 className="text-lg   font-bold ml-4 mb-4">
               Average Task Completion Time
             </h2>
-            <div className="h-80 w-80">
+            <div className="h-60 w-60">
               <CompletionTime tasks={tasks} />
             </div>
           </div>

@@ -29,10 +29,9 @@ function Velocity({ tasks }: Props) {
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={velocityData}>
         <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-        <XAxis dataKey="date" stroke="#ccc" />
-        <YAxis stroke="#ccc" />
+        <XAxis dataKey="date" />
+        <YAxis />
         <Tooltip />
-        <Legend />
         <Line
           type="monotone"
           dataKey="velocity"

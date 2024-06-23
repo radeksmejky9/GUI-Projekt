@@ -1,29 +1,19 @@
 import React from "react";
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { TaskInterface } from "../../types/types";
+
 interface Props {
   tasks: TaskInterface[];
 }
+
 function TaskDistribution({ tasks }: Props) {
   const taskCompletionStatusData = React.useMemo(
     () => calculateTaskCompletionStatusData(tasks),
     [tasks]
   );
-  const COLORS = ["#8884d8", "#82ca9d"];
+
+  const COLORS = ["#82ca9d", "#ff7f50", "#8884d8"];
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
@@ -49,13 +39,25 @@ function TaskDistribution({ tasks }: Props) {
 function calculateTaskCompletionStatusData(
   tasksData: TaskInterface[]
 ): { status: string; count: number }[] {
+  const currentDate = new Date();
+
   const completedTasks = tasksData.filter(
-    (task) => new Date(task.completion_date) > new Date("1970-01-01")
+    (task) =>
+      task.completion_date && new Date(task.completion_date) > new Date(0)
   ).length;
-  const incompleteTasks = tasksData.length - completedTasks;
+
+  const failedTasks = tasksData.filter(
+    (task) =>
+      task.deadline &&
+      new Date(task.deadline) < currentDate &&
+      (!task.completion_date || new Date(task.completion_date) <= new Date(0))
+  ).length;
+
+  const incompleteTasks = tasksData.length - completedTasks - failedTasks;
 
   return [
     { status: "Completed", count: completedTasks },
+    { status: "Overdue", count: failedTasks },
     { status: "Incomplete", count: incompleteTasks },
   ];
 }
